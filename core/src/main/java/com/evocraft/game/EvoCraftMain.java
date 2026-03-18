@@ -1,12 +1,12 @@
 package com.evocraft.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,9 +15,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.evocraft.game.Entities.Item;
 import com.evocraft.game.Entities.Player;
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 
 public class EvoCraftMain extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -78,7 +75,6 @@ public class EvoCraftMain extends ApplicationAdapter {
         for (Item item: items) {
             if (!item.isCollected() && player.getBounds().overlaps(item.getBounds())) {
                 item.collect();
-                player.eat(20);
                 Gdx.app.log("Game", "Collected" + item.getName());
             }
         }
@@ -110,24 +106,6 @@ public class EvoCraftMain extends ApplicationAdapter {
         shapeRenderer.rect(player.getX() + p, player.getY(), player.getWidth() - 2*p, 5);
 
         shapeRenderer.end();
-
-        // Hunger Bar
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        // Tính toán lại uiX, uiY chuẩn xác
-        float uiX = camera.position.x - viewport.getWorldWidth() / 2 + 20;
-        float uiY = camera.position.y + viewport.getWorldHeight() / 2 - 40; // Dùng Height và dấu CỘNG
-
-        // Vẽ khung đen (Dài 104 để bao quanh thanh hunger 100)
-        shapeRenderer.setColor(Color.BLACK);
-        shapeRenderer.rect(uiX, uiY, 104, 15);
-
-// Vẽ thanh Hunger màu cam
-        shapeRenderer.setColor(Color.ORANGE);
-// player.getHunger() trả về từ 0-100, tương ứng với chiều dài thanh
-        shapeRenderer.rect(uiX + 2, uiY + 2, player.getHunger(), 11);
-
-        shapeRenderer.end(); // Đừng quên kết thúc!
 
     }
 
