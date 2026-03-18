@@ -4,16 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
-
-import java.awt.*;
 
 public class Player extends Entity{
     private float speed = 200f;
     private TiledMap map;
-    private float hunger = 100f;
 
     public Player(Texture texture, float x, float y, TiledMap map) {
         super(texture, x, y);
@@ -70,15 +66,6 @@ public class Player extends Entity{
 
     public float getHeight() {
         return sprite.getHeight();
-    }
-
-    public float getHunger() {
-        return hunger;
-    }
-
-    public void eat(float amount) {
-        this.hunger += amount;
-        if (this.hunger > 100) this.hunger = 100;
     }
 
     public Rectangle getBounds() {

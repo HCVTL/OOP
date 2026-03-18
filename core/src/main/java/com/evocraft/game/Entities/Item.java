@@ -3,8 +3,6 @@ package com.evocraft.game.Entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.awt.*;
-
 public class Item extends Entity{
     private boolean collected = false;
     private String name;
@@ -23,10 +21,10 @@ public class Item extends Entity{
 
     @Override
     public void update (float delta) {
-        stateTime += delta;
+        // stateTime += delta;
 
-        float alpha = 0.5f + (float)Math.sin(stateTime * 5f) * 0.5f;
-        sprite.setAlpha(alpha);
+        // float alpha = 0.5f + (float)Math.sin(stateTime * 5f) * 0.5f;
+        // sprite.setAlpha(alpha);
     }
 
     public boolean isCollected() {
