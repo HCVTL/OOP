@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -29,6 +31,9 @@ public class EvoCraftMain extends ApplicationAdapter {
 
     private ArrayList<Item> items;
     private Texture appleTexture;
+
+    private Texture pointerTexture;
+    private Sprite pointerSprite;
 
     @Override
     public void create() {
@@ -54,6 +59,11 @@ public class EvoCraftMain extends ApplicationAdapter {
         items.add(new Item(appleTexture, 400, 300, "Apple"));
 
         shapeRenderer = new ShapeRenderer();
+
+        // Mũi tên trên đồ vật
+        pointerTexture = new Texture("arrow.png");
+        pointerSprite = new Sprite(pointerTexture);
+        pointerSprite.setSize(16, 16);
     }
 
     @Override
@@ -72,13 +82,6 @@ public class EvoCraftMain extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.4f, 0.6f, 0.6f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        for (Item item: items) {
-            if (!item.isCollected() && player.getBounds().overlaps(item.getBounds())) {
-                item.collect();
-                Gdx.app.log("Game", "Collected" + item.getName());
-            }
-        }
-
         // 5. Vẽ Bản đồ
         mapRenderer.setView(camera);
         mapRenderer.render();
@@ -91,22 +94,24 @@ public class EvoCraftMain extends ApplicationAdapter {
             if (!item.isCollected()) item.draw(batch);
         }
         player.draw(batch);
+        
+        // Hiển thị mũi tên và nhặt đồ vât
+        for (Item item: items) {
+            if (!item.isCollected() && player.isNear(item)) {
+                // Vẽ mũi tên trên đồ vật
+                float pointerX = item.getX() + item.getWidth() / 2 - pointerSprite.getWidth() / 2;
+                float pointerY = item.getY() + item.getHeight() + 5; // Đặt mũi tên trên đồ vật
+                pointerSprite.setPosition(pointerX, pointerY);
+                pointerSprite.draw(batch);
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                    item.collect();
+                    Gdx.app.log("Inventory", "Collected: " + item.getName());
+                }
+            }
+        }
+
         batch.end();
-
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.RED);
-
-        // Vẽ 2 điểm kiểm tra va chạm dưới chân (giả sử padding là 10)
-        float p = 0f;
-        shapeRenderer.circle(player.getX() + p, player.getY() + 2, 2); // Điểm trái
-        shapeRenderer.circle(player.getX() + player.getWidth() - p, player.getY() + 2, 2); // Điểm phải
-
-        // Vẽ khung bao quanh vùng chân
-        shapeRenderer.rect(player.getX() + p, player.getY(), player.getWidth() - 2*p, 5);
-
-        shapeRenderer.end();
-
     }
 
     @Override

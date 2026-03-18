@@ -72,6 +72,13 @@ public class Player extends Entity{
         return sprite.getBoundingRectangle();
     }
 
+    public boolean isNear(Item item) {
+        float disX = (this.x + this.getWidth() / 2) - (item.getX() + item.getWidth() / 2);
+        float disY = (this.y + this.getHeight() / 2) - (item.getY() + item.getHeight() / 2);
+        float distance = (float) Math.sqrt(disX * disX + disY * disY);
+        return distance < 50f; // Giới hạn khoảng cách để "gần"
+    }
+
     public void dispose() {
         sprite.getTexture().dispose();
     }

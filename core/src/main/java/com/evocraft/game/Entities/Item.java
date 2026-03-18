@@ -35,6 +35,14 @@ public class Item extends Entity{
         this.collected = true;
     }
 
+    public float getWidth() {
+        return sprite.getWidth();
+    }
+
+    public float getHeight() {
+        return sprite.getHeight();
+    }
+
     public String getName() {
         return name;
     }
