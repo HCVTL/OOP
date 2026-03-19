@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -35,9 +37,15 @@ public class EvoCraftMain extends ApplicationAdapter {
     private Texture pointerTexture;
     private Sprite pointerSprite;
 
+    private boolean isDialogActive = false;
+    private String dialogText = "";
+    private String speakerName = "";
+    private BitmapFont font;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
+        font = new BitmapFont();
 
         // 1. Thiết lập Camera (Nhìn vào vùng không gian 800x480 đơn vị)
         camera = new OrthographicCamera();
@@ -66,13 +74,41 @@ public class EvoCraftMain extends ApplicationAdapter {
         pointerSprite.setSize(16, 16);
     }
 
+    private void drawDialogBox() {
+        if (!isDialogActive) return;
+
+        // 1. Vẽ khung đen mờ bằng ShapeRenderer
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 0.7f); // Màu đen, độ mờ 70%
+
+        float boxW = viewport.getWorldWidth() - 40;
+        float boxH = 100;
+        float boxX = camera.position.x - boxW / 2;
+        float boxY = camera.position.y - viewport.getWorldHeight() / 2 + 20;
+
+        shapeRenderer.rect(boxX, boxY, boxW, boxH);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        // 2. Vẽ chữ lên trên bằng Batch
+        batch.begin();
+        font.setColor(Color.YELLOW);
+        font.draw(batch, speakerName + ":", boxX + 20, boxY + boxH - 20); // Tên người nói
+        font.setColor(Color.WHITE);
+        font.draw(batch, dialogText, boxX + 20, boxY + boxH - 50, boxW - 40, com.badlogic.gdx.utils.Align.left, true);   // Nội dung
+        batch.end();
+        
+    }
+
     @Override
     public void render() {
         // 1. Lấy thời gian trôi qua giữa 2 khung hình
         float delta = Gdx.graphics.getDeltaTime();
 
         // 2. Cập nhật logic (Quan trọng!)
-        player.update(delta);
+        if (!isDialogActive) player.update(delta); // Chỉ cập nhật khi hộp thoại không hoạt động
 
         // 3. Cập nhật Camera đuổi theo nhân vật
         camera.position.set(player.getX(), player.getY(), 0);
@@ -87,7 +123,7 @@ public class EvoCraftMain extends ApplicationAdapter {
         mapRenderer.render();
 
 
-        // 6. Vẽ Nhân vật
+        // 6. Vẽ Nhân vật và đồ vật
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Item item: items) {
@@ -105,13 +141,24 @@ public class EvoCraftMain extends ApplicationAdapter {
                 pointerSprite.draw(batch);
 
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    item.collect();
-                    Gdx.app.log("Inventory", "Collected: " + item.getName());
+                    if (!isDialogActive) {
+                        isDialogActive = true;
+                        dialogText = "You picked up an " + item.getName() + "!";
+                        speakerName = "Player";
+                    }
+                    else {
+                        item.collect();
+                        isDialogActive = false;
+                        dialogText = "";
+                        speakerName = "";
+                    }
                 }
             }
         }
-
         batch.end();
+
+        // 7. Vẽ hộp thoại nếu đang hoạt động
+        drawDialogBox();
     }
 
     @Override
