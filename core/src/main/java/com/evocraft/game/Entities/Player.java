@@ -8,7 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player extends Entity{
-    private float speed = 200f;
+    private float speed = 120f;
     private TiledMap map;
 
     public Player(Texture texture, float x, float y, TiledMap map) {
@@ -72,11 +72,20 @@ public class Player extends Entity{
         return sprite.getBoundingRectangle();
     }
 
-    public boolean isNear(Item item) {
-        float disX = (this.x + this.getWidth() / 2) - (item.getX() + item.getWidth() / 2);
-        float disY = (this.y + this.getHeight() / 2) - (item.getY() + item.getHeight() / 2);
+    // Sửa Item thành Entity để dùng chung cho cả NPC và Vật chứng
+    public boolean isNear(Entity entity) {
+        if (entity == null) return false;
+
+        // Tính toán khoảng cách giữa tâm của Player và tâm của Entity
+        float disX = (this.x + this.getWidth() / 2) - (entity.getX() + entity.sprite.getWidth() / 2);
+        float disY = (this.y + this.getHeight() / 2) - (entity.getY() + entity.sprite.getHeight() / 2);
         float distance = (float) Math.sqrt(disX * disX + disY * disY);
-        return distance < 50f; // Giới hạn khoảng cách để "gần"
+
+        return distance < 50f;
+    }
+
+    public void setMap(TiledMap newMap) {
+        this.map = newMap;
     }
 
     public void dispose() {
