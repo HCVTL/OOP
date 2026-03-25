@@ -1,7 +1,5 @@
 package com.evocraft.game;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -19,7 +17,7 @@ import com.evocraft.game.Entities.Player;
 import com.evocraft.game.Managers.DialogueManager;
 import com.evocraft.game.Managers.EntityManager;
 
-public class EvoCraftMain extends ApplicationAdapter {
+public class ChronosDetective extends ApplicationAdapter {
     private SpriteBatch batch;
     private Player player;
     private ShapeRenderer shapeRenderer;
