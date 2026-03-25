@@ -1,7 +1,7 @@
-package com.evocraft.game;
+package com.evocraft.game.Screens;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,15 +12,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.evocraft.game.ChronosDetectiveGame;
 import com.evocraft.game.Entities.Item;
 import com.evocraft.game.Entities.Player;
 import com.evocraft.game.Managers.DialogueManager;
 import com.evocraft.game.Managers.EntityManager;
 
-public class ChronosDetective extends ApplicationAdapter {
+public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Player player;
-    private ShapeRenderer shapeRenderer;
 
     private OrthographicCamera camera;
     private FitViewport viewport;
@@ -32,8 +32,15 @@ public class ChronosDetective extends ApplicationAdapter {
     private DialogueManager dialogueManager;
 
     private Sprite pointerSprite;
+
+    private final ChronosDetectiveGame game;
+
+    public GameScreen(ChronosDetectiveGame game) {
+        this.game = game;
+    }
+
     @Override
-    public void create() {
+    public void show() {
         batch = new SpriteBatch();
 
         // 1. Setup Camera & Viewport
@@ -70,9 +77,7 @@ public class ChronosDetective extends ApplicationAdapter {
 
 
     @Override
-    public void render() {
-        // 1. Lấy thời gian trôi qua giữa 2 khung hình
-        float delta = Gdx.graphics.getDeltaTime();
+    public void render(float delta) {
 
         // 2. Cập nhật logic (Quan trọng!)
         if (!dialogueManager.isActive()) player.update(delta); // Chỉ cập nhật khi hộp thoại không hoạt động
@@ -108,9 +113,20 @@ public class ChronosDetective extends ApplicationAdapter {
     }
 
     @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {
+        // Hàm này gọi khi bạn chuyển sang Screen khác
+        // Thường dùng để gọi dispose() hoặc dừng nhạc
+    }
+
+    @Override
     public void dispose() {
         batch.dispose();
-        shapeRenderer.dispose();
         player.dispose();
         map.dispose();
         dialogueManager.dispose();
