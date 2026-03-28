@@ -2,11 +2,11 @@ package com.evocraft.game.Managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.evocraft.game.Entities.Entity;
 import com.evocraft.game.Entities.Item;
 import com.evocraft.game.Entities.NPC;
 import com.evocraft.game.Entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import java.util.ArrayList;
 
 public class EntityManager {
@@ -28,11 +28,11 @@ public class EntityManager {
         npcs.add(npc);
     }
 
-    public void update(float delta, Player player, DialogueManager dialogueManager) {
+    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory) {
         for (Item item : items) {
             if (!item.isCollected() && player.isNear(item)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    handleItemInteraction(item, dialogueManager);
+                    handleItemInteraction(item, dialogueManager, inventory);
                 }
             }
         }
@@ -46,13 +46,14 @@ public class EntityManager {
         }
     }
 
-    public void handleItemInteraction(Item item, DialogueManager dm) {
+    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory) {
         if (!dm.isActive()) {
             dm.startDialogue("Tham tu", "Day la " + item.getName() + ". Toi se lay no.");
         }
         else {
             dm.closeDialogue();
             item.collect();
+            inventory.addItem(item);
         }
     }
 

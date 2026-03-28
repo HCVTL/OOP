@@ -3,45 +3,137 @@ package com.evocraft.game.Entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity{
     private float speed = 120f;
     private TiledMap map;
 
+    private enum State {IDLE, WALKING}
+    private enum Direction {UP, DOWN, LEFT, RIGHT}
+
+    private State currentState = State.IDLE;
+    private Direction currentDirection = Direction.DOWN;
+
+    private Animation<TextureRegion> walkUp;
+    private Animation<TextureRegion> walkDown;
+    private Animation<TextureRegion> walkLeft;
+    private Animation<TextureRegion> walkRight;
+
+    private Animation<TextureRegion> idleUp;
+    private Animation<TextureRegion> idleDown;
+    private Animation<TextureRegion> idleLeft;
+    private Animation<TextureRegion> idleRight;
+
+    private float stateTime = 0f;
+    private final float SPEED = 100f;
+    private Vector2 position;
+    private float width = 64, height = 64;
+
     public Player(Texture texture, float x, float y, TiledMap map) {
         super(texture, x, y);
+        this.position = new Vector2(x, y);
+
+        /*
         this.map = map;
         this.sprite.setSize(32, 32);
+        */
+        int FRAME_COLS = 6;
+        int FRAME_ROWS = 6;
+
+        TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS,
+                                                    texture.getHeight() / FRAME_ROWS);
+
+        float frameDuration = 0.2f;
+        walkRight = new Animation<>(frameDuration, tmp[4]);
+        idleRight = new Animation<>(frameDuration, tmp[1]);
+
+        TextureRegion[] walkLeftFrames = new TextureRegion[FRAME_COLS];
+        TextureRegion[] idleLeftFrames = new TextureRegion[FRAME_COLS];
+        for (int i = 0; i < FRAME_COLS; i++) {
+            walkLeftFrames[i] = new TextureRegion(tmp[4][i]);
+            walkLeftFrames[i].flip(true, false);
+
+            idleLeftFrames[i] = new TextureRegion(tmp[1][i]);
+            idleLeftFrames[i].flip(true, false);
+        }
+        walkLeft = new Animation<>(frameDuration, walkLeftFrames);
+        idleLeft = new Animation<>(frameDuration, idleLeftFrames);
+
+        walkDown = new Animation<>(frameDuration, tmp[3]);
+        walkUp = new Animation<>(frameDuration, tmp[5]);
+        idleDown = new Animation<>(frameDuration, tmp[0]);
+        idleUp = new Animation<>(frameDuration, tmp[2]);
+
+        walkDown.setPlayMode(Animation.PlayMode.LOOP);
+        walkUp.setPlayMode(Animation.PlayMode.LOOP);
+        walkLeft.setPlayMode(Animation.PlayMode.LOOP);
+        walkRight.setPlayMode(Animation.PlayMode.LOOP);
+
+        idleDown.setPlayMode(Animation.PlayMode.LOOP);
+        idleUp.setPlayMode(Animation.PlayMode.LOOP);
+        idleLeft.setPlayMode(Animation.PlayMode.LOOP);
+        idleRight.setPlayMode(Animation.PlayMode.LOOP);
+
     }
 
     @Override
     public void update(float delta) {
-        float oldX = x, oldY = y;
-        float move = speed * delta;
-        float p = 12f;
+        currentState = State.IDLE;
 
-        // Di chuyển trục X trước
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) x -= move;
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) x += move;
-
-        // Kiểm tra va chạm trục X (kiểm tra vùng chân nhân vật)
-        if (isCollision(x + p, y + 2) || isCollision(x + sprite.getWidth() - p, y + 2)) {
-            x = oldX;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            position.y += SPEED * delta;
+            currentDirection = Direction.UP;
+            currentState = State.WALKING;
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            position.y -= SPEED * delta;
+            currentDirection = Direction.DOWN;
+            currentState = State.WALKING;
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            position.x -= SPEED * delta;
+            currentDirection = Direction.LEFT;
+            currentState = State.WALKING;
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            position.x += SPEED * delta;
+            currentDirection = Direction.RIGHT;
+            currentState = State.WALKING;
         }
 
-        // Di chuyển trục Y sau
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) y += move;
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) y -= move;
+        stateTime += delta;
+    }
 
-        // Kiểm tra va chạm trục Y
-        if (isCollision(x + p, y + 2) || isCollision(x + sprite.getWidth() - p, y + 2)) {
-            y = oldY;
+    public void draw(SpriteBatch batch) {
+        TextureRegion currentFrame;
+
+        if (currentState == State.WALKING) {
+            switch (currentDirection) {
+                case UP: currentFrame = walkUp.getKeyFrame(stateTime); break;
+                case DOWN: currentFrame = walkDown.getKeyFrame(stateTime); break;
+                case LEFT: currentFrame = walkLeft.getKeyFrame(stateTime); break;
+                case RIGHT: currentFrame = walkRight.getKeyFrame(stateTime); break;
+                default: currentFrame = walkDown.getKeyFrame(stateTime); break;
+            }
+        }
+        else {
+            switch (currentDirection) {
+                case UP:    currentFrame = idleUp.getKeyFrame(stateTime); break;
+                case DOWN:  currentFrame = idleDown.getKeyFrame(stateTime); break;
+                case LEFT:  currentFrame = idleLeft.getKeyFrame(stateTime); break;
+                case RIGHT: currentFrame = idleRight.getKeyFrame(stateTime); break;
+                default:    currentFrame = idleDown.getKeyFrame(stateTime); break;
+            }
         }
 
-        sprite.setPosition(x, y);
+        batch.draw(currentFrame, position.x, position.y, width, height);
     }
 
     public boolean isCollision(float worldX, float worldY) {
