@@ -1,4 +1,4 @@
-package com.evocraft.game.Managers;
+package com.ChronosDetective.game.Managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.ChronosDetective.game.Utils.FontUtils;
 
 public class DialogueManager {
     private ShapeRenderer shapeRenderer;
@@ -25,9 +26,9 @@ public class DialogueManager {
     public DialogueManager(Viewport viewport, OrthographicCamera camera) {
         this.viewport = viewport;
         this.shapeRenderer = new ShapeRenderer();
-        this.font = new BitmapFont();
+        this.font = FontUtils.createUnicodeFont(30);
         this.camera = camera;
-        this.font.getData().setScale(1.2f);
+        this.font.getData().setScale(1.0f);
     }
 
     // Hàm kích hoạt hội thoại

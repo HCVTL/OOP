@@ -1,4 +1,4 @@
-package com.evocraft.game.Entities;
+package com.ChronosDetective.game.Entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -86,6 +86,12 @@ public class Player extends Entity{
 
     public void setMap(TiledMap newMap) {
         this.map = newMap;
+    }
+
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        sprite.setPosition(x, y);
     }
 
     public void dispose() {
