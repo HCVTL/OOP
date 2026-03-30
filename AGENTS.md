@@ -38,6 +38,7 @@ Assets: `assets/` (ví dụ `map.tmx`, `player2.png`, `apple.png`, `arrow.png`).
 
 - Giữ style hiện có: package, tên class, comment tiếng Việt nơi đã dùng.
 - Luôn cập nhật lại `docs/` và `AGENTS.md` khi có thay đổi (luồng code, kiến trúc, cách build/chạy, hoặc hành vi gameplay).
+- **Bắt buộc cập nhật `README.md` trước khi push code** nếu có thay đổi tính năng, điều khiển, cách chạy/build, hoặc cấu trúc thư mục/module.
 - Màn hình libGDX: `show` khởi tạo, `render` cập nhật + vẽ, `dispose` giải phóng texture/batch/map/font/shape.
 - Va chạm player: layer Tiled `"Fences"`, tile 16px (xem `Player.isCollision`).
 - Tương tác: phím **E** qua `EntityManager`; khi dialogue bật, `GameScreen` không gọi `player.update`.

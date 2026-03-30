@@ -1,33 +1,58 @@
 # ChronosDetective
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Game trinh tham 2D duoc xay dung bang [libGDX](https://libgdx.com/) + LWJGL3.
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+## Cau truc module
 
-## Platforms
+- `core`: logic game (screen, entity, manager, save/load).
+- `lwjgl3`: launcher desktop va cau hinh cua so.
+- `assets`: map, sprite, font, save local runtime.
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+## Chay game (Windows)
 
-## Gradle
+```bat
+run-game.bat
+```
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+`run-game.bat` se:
+- tu tim JDK neu chua co `JAVA_HOME`,
+- tu kill instance game cu (neu dang chay),
+- chay lai `gradlew.bat lwjgl3:run`.
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+## Phim dieu khien chinh
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+- `W A S D`: di chuyen.
+- `E`: tuong tac item/NPC.
+- `O`: mo form Save game.
+- `ESC`: mo form hoi thoat game (ve menu neu chon "Co").
+
+## Save/Load session
+
+- **NEW GAME**: tao session moi.
+- **CONTINUE**: vao session gan nhat (neu chua co se tao moi).
+- **LOAD**: mo danh sach session de chon load.
+- Trong game, bam **O** de luu vao session hien tai hoac session duoc chon.
+
+Du lieu save duoc luu trong:
+- `assets/saves/index.json` (danh sach session + session gan nhat)
+- `assets/saves/<sessionId>.json` (du lieu tung session)
+
+## Font tieng Viet
+
+He thong UI va dialogue da dung font Unicode qua FreeType.
+
+Dat 1 trong 2 file sau vao `assets/fonts/`:
+- `NotoSans-Regular.ttf` (khuyen nghi)
+- `Roboto-Regular.ttf`
+
+Neu khong co file trong assets, desktop Windows se fallback sang font he thong.
+
+## Build nhanh
+
+```bat
+gradlew.bat clean
+gradlew.bat :core:compileJava :lwjgl3:compileJava
+gradlew.bat lwjgl3:jar
+```
+
+Jar output: `lwjgl3/build/libs/`
