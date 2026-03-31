@@ -168,10 +168,13 @@ public class Player extends Entity{
     public boolean isNear(Entity entity) {
         if (entity == null) return false;
 
-        // Tính toán khoảng cách giữa tâm của Player và tâm của Entity
-        float disX = (this.x + this.getWidth() / 2) - (entity.getX() + entity.sprite.getWidth() / 2);
-        float disY = (this.y + this.getHeight() / 2) - (entity.getY() + entity.sprite.getHeight() / 2);
-        float distance = (float) Math.sqrt(disX * disX + disY * disY);
+        float centerX = this.x + getWidth() / 2;
+        float centerY = this.y + getHeight() / 2;
+
+        float targetX = entity.getX() + entity.getWidth() / 2;
+        float targetY = entity.getY() + entity.getHeight() / 2;
+
+        float distance = Vector2.dst(centerX, centerY, targetX, targetY);
 
         return distance < 50f;
     }
