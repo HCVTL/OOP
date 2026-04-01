@@ -40,10 +40,8 @@ public class Player extends Entity{
         super(texture, x, y);
         this.position = new Vector2(x, y);
 
-        /*
+
         this.map = map;
-        this.sprite.setSize(32, 32);
-        */
         int FRAME_COLS = 6;
         int FRAME_ROWS = 6;
 
@@ -87,27 +85,30 @@ public class Player extends Entity{
     public void update(float delta) {
         currentState = State.IDLE;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            position.y += SPEED * delta;
-            currentDirection = Direction.UP;
-            currentState = State.WALKING;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            position.y -= SPEED * delta;
-            currentDirection = Direction.DOWN;
-            currentState = State.WALKING;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            position.x -= SPEED * delta;
-            currentDirection = Direction.LEFT;
-            currentState = State.WALKING;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            position.x += SPEED * delta;
-            currentDirection = Direction.RIGHT;
-            currentState = State.WALKING;
+        float oldX = position.x;
+        float oldY = position.y;
+
+        float moveX = 0;
+        float moveY = 0;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) { moveY += SPEED * delta; currentDirection = Direction.UP; currentState = State.WALKING; }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) { moveY -= SPEED * delta; currentDirection = Direction.DOWN; currentState = State.WALKING; }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) { moveX -= SPEED * delta; currentDirection = Direction.LEFT; currentState = State.WALKING; }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) { moveX += SPEED * delta; currentDirection = Direction.RIGHT; currentState = State.WALKING; }
+
+        position.x += moveX;
+        if (checkCollisionAtPoints(position.x, position.y)) {
+            position.x = oldX;
         }
 
+        position.y += moveY;
+        if (checkCollisionAtPoints(position.x, position.y)) {
+            position.y = oldY;
+        }
+
+
+        this.x = position.x;
+        this.y = position.y;
         stateTime += delta;
     }
 
@@ -152,12 +153,20 @@ public class Player extends Entity{
         return cell != null;
     }
 
+    private boolean checkCollisionAtPoints(float x, float y) {
+        float pX = 20f;
+        float pY = 10f;
+
+        return (isCollision(x + pX, y + pY) || isCollision(x + width - pX, y + pY) ||
+                isCollision(x + pX, y + height / 2) || isCollision(x + width - pX, y + height / 2));
+    }
+
     public float getWidth() {
-        return sprite.getWidth();
+        return width;
     }
 
     public float getHeight() {
-        return sprite.getHeight();
+        return height;
     }
 
     public Rectangle getBounds() {
