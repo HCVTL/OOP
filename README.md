@@ -17,7 +17,10 @@ run-game.bat
 `run-game.bat` se:
 - tu tim JDK neu chua co `JAVA_HOME`,
 - tu kill instance game cu (neu dang chay),
-- chay lai `gradlew.bat lwjgl3:run`.
+- `gradlew --stop`, cho 1 giay, roi xoa `core/build` va `lwjgl3/build` neu con (giam loi Windows khoa file khi build),
+- chay `gradlew.bat lwjgl3:run`.
+
+Neu van bao loi khong xoa duoc thu muc `build`, hay tat game/IDE dang mo file trong do, hoac dong Cursor/IntelliJ roi chay lai.
 
 ## Phim dieu khien chinh
 

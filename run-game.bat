@@ -42,6 +42,9 @@ if defined JAVA_HOME set "JAVA_HOME=!JAVA_HOME:"=!"
 
 call :kill_running_game
 call gradlew.bat --stop >nul 2>&1
+rem Cho OS giai phong handle file sau khi tat daemon / game
+timeout /t 1 /nobreak >nul
+call :remove_build_output_dirs
 
 call gradlew.bat lwjgl3:run
 exit /b %errorlevel%
@@ -57,4 +60,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  }" ^
   "};" ^
   "if ($killed -eq 0) { Write-Host '[run-game.bat] Khong tim thay game dang chay.' }"
+exit /b 0
+
+:remove_build_output_dirs
+rem Xoa core/build va lwjgl3/build neu con (tranh loi Gradle khong xoa duoc stale outputs tren Windows)
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$root = (Get-Location).Path;" ^
+  "foreach ($p in @('core\\build','lwjgl3\\build')) {" ^
+  "  $full = Join-Path $root $p;" ^
+  "  if (Test-Path $full) { try { Remove-Item -LiteralPath $full -Recurse -Force -ErrorAction Stop; Write-Host ('[run-game.bat] Da xoa ' + $p) } catch { Write-Host ('[run-game.bat] Khong xoa duoc ' + $p + ' — hay tat game/IDE dang giu file.') } }" ^
+  "}"
 exit /b 0
