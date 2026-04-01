@@ -192,6 +192,11 @@ public class Player extends Entity{
         this.map = newMap;
     }
 
+    public void setPosition(float x, float y) {
+        position.x = x;
+        position.y = y;
+    }
+
     public void dispose() {
         sprite.getTexture().dispose();
     }

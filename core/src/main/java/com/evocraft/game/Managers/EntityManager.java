@@ -84,4 +84,9 @@ public class EntityManager {
         pointerSprite.setPosition(x + w / 2 - pointerSprite.getWidth() / 2, y + h + 5);
         pointerSprite.draw(batch);
     }
+
+    public void clearEntities() {
+        items.clear();
+        npcs.clear();
+    }
 }
