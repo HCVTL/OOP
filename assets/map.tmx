@@ -34,7 +34,7 @@
 107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,1,1,107,107,107,107,107,107,107,107,107,107
 </data>
  </layer>
- <layer id="3" name="Portals" width="30" height="20">
+ <layer id="3" name="Door" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -61,9 +61,9 @@
  <objectgroup id="4" name="Portals">
   <object id="1" name="map" x="401.108" y="272.576" width="29.9169" height="47.6454">
    <properties>
-    <property name="mapSpawnX" type="float" value="100"/>
-    <property name="mapSpawnY" type="float" value="100"/>
-    <property name="targetMap" value="map_kitchen"/>
+    <property name="targetMap" value="kitchen.tmx"/>
+    <property name="targetSpawnX" type="float" value="100"/>
+    <property name="targetSpawnY" type="float" value="100"/>
    </properties>
   </object>
  </objectgroup>
