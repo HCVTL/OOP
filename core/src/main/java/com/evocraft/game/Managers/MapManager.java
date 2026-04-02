@@ -54,16 +54,20 @@ public class MapManager {
         // Lấy vùng để xử lý logic chuyển map
         MapLayer layer = currentMap.getLayers().get("Portals");
 
-        if (layer == null) return;
+        if (layer == null) {
+            System.out.println("Lỗi: Không tìm thấy lớp nào tên Portals");
+            return;
+        }
 
         for (MapObject object : layer.getObjects()) {
             if (object instanceof RectangleMapObject) {
                 Rectangle rect = ((RectangleMapObject) object). getRectangle();
                 if (player.getBounds().overlaps(rect)) {
                     String target = object.getProperties().get("targetMap", String.class);
-                    float tx = object.getProperties().get("targetSpawnX", Float.class);
-                    float ty = object.getProperties().get("targetSpawnY", Float.class);
+                    float tx = object.getProperties().get("targetSpawnX", Number.class).floatValue();
+                    float ty = object.getProperties().get("targetSpawnY", Number.class).floatValue();
 
+                    System.out.println("Va chạm cửa! Chuyển đến: " + target); // Thêm dòng này để kiểm tra console
                     listener.onTransition(target, tx, ty);
                     break;
                 }
