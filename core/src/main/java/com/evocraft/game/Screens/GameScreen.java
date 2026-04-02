@@ -3,14 +3,20 @@ package com.evocraft.game.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.evocraft.game.ChronosDetectiveGame;
@@ -126,6 +132,28 @@ public class GameScreen implements Screen {
             player.draw(batch);
             entityManager.draw(batch, player);
         batch.end();
+
+
+        // Trong GameScreen.render() sau khi vẽ batch.end()
+        ShapeRenderer debugRenderer = new ShapeRenderer();
+        debugRenderer.setProjectionMatrix(camera.combined);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.setColor(Color.RED);
+
+        // Vẽ thử cái khung của Portal
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                debugRenderer.rect(r.x, r.y, r.width, r.height);
+            }
+        }
+
+        debugRenderer.setColor(Color.BLUE); // Màu xanh cho thám tử
+        Rectangle pb = player.getBounds();
+        debugRenderer.rect(pb.x, pb.y, pb.width, pb.height);
+        debugRenderer.end();
+
 
         // 3. Vẽ UI (Hộp thoại trên cùng)
         dialogueManager.draw(batch);
