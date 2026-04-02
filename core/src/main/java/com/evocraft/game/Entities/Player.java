@@ -170,7 +170,14 @@ public class Player extends Entity{
     }
 
     public Rectangle getBounds() {
-        return sprite.getBoundingRectangle();
+        // 64 (chiều rộng nhân vật) - 20 (chiều rộng khung) = 44
+        // Chia đôi ra là 22 để khung nằm chính giữa theo chiều ngang
+        float offsetX = (width - 20) / 2f;
+
+        // Y giữ nguyên hoặc cộng thêm một chút nếu muốn khung nằm ở chân
+        float offsetY = 5f;
+
+        return new Rectangle(position.x + offsetX, position.y + offsetY, 20, 20);
     }
 
     // Sửa Item thành Entity để dùng chung cho cả NPC và Vật chứng
