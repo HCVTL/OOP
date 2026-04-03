@@ -125,7 +125,7 @@ public class DialogueManager {
         if (isFinished()) {
             font.getData().setScale(zoom * 0.75f);
             font.setColor(Color.GRAY);
-            font.draw(batch, "[SPACE TO CLOSE]", boxX + boxW - (160 * zoom), boxY + (25 * zoom));
+            font.draw(batch, "[PRESS E TO CLOSE]", boxX + boxW - (160 * zoom), boxY + (25 * zoom));
         }
 
         batch.end();

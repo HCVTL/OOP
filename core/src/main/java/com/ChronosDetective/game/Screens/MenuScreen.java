@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;   // Đã sửa để 
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.ChronosDetective.game.Save.SaveRepository;
@@ -106,12 +110,11 @@ public class MenuScreen implements Screen {
     }
 
     private void setupMenuFont() {
-        // Nạp font từ file arial.ttf (Lưu ý đường dẫn fonts/arial.ttf trong assets)
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 
-        parameter.size = 26;
-        parameter.borderWidth = 1.2f;
+        parameter.size = 28;
+        parameter.borderWidth = 1.5f;
         parameter.borderColor = Color.BLACK;
         parameter.magFilter = Texture.TextureFilter.Linear;
         parameter.minFilter = Texture.TextureFilter.Linear;
@@ -120,21 +123,32 @@ public class MenuScreen implements Screen {
         menuFont = generator.generateFont(parameter);
         generator.dispose();
 
-        // Ép font vào VisUI Skin
         if (VisUI.isLoaded()) {
-            VisUI.getSkin().add("default-font", menuFont, BitmapFont.class);
+            com.badlogic.gdx.scenes.scene2d.ui.Skin skin = VisUI.getSkin();
+            skin.add("default-font", menuFont, BitmapFont.class);
 
-            // Cập nhật Style cho Button
-            VisTextButton.VisTextButtonStyle buttonStyle = VisUI.getSkin().get(VisTextButton.VisTextButtonStyle.class);
+            // --- THIẾT KẾ BO GÓC KHÔNG CẦN IMPORT THÊM ---
+
+            // 1. Tạo nền Dialog (Bo góc 20px)
+            Drawable dialogBg = createRoundedDrawable(100, 100, 20, new Color(0.05f, 0.05f, 0.1f, 0.88f));
+
+            // Thay vì dùng VisDialogStyle (lỗi), ta lấy trực tiếp WindowStyle từ Skin
+            // VisDialog sử dụng chung style với Window
+            skin.get(com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle.class).background = dialogBg;
+            skin.get(com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle.class).titleFont = menuFont;
+
+            // 2. Tạo nền Nút bấm bo góc (12px)
+            Drawable btnUp = createRoundedDrawable(100, 40, 12, new Color(0.15f, 0.15f, 0.25f, 1f));
+            Drawable btnOver = createRoundedDrawable(100, 40, 12, new Color(0.25f, 0.25f, 0.45f, 1f));
+
+            VisTextButton.VisTextButtonStyle buttonStyle = skin.get(VisTextButton.VisTextButtonStyle.class);
+            buttonStyle.up = btnUp;
+            buttonStyle.over = btnOver;
             buttonStyle.font = menuFont;
 
-            // Cập nhật Style cho Label (Làm sáng dòng import LabelStyle)
-            LabelStyle labelStyle = VisUI.getSkin().get(LabelStyle.class);
-            labelStyle.font = menuFont;
-
-            // Cập nhật Style cho List (Làm sáng dòng import ListStyle)
-            ListStyle listStyle = VisUI.getSkin().get(ListStyle.class);
-            listStyle.font = menuFont;
+            // 3. Cập nhật Font cho Label và List (Sử dụng các class bạn đã import)
+            skin.get(LabelStyle.class).font = menuFont;
+            skin.get(ListStyle.class).font = menuFont;
         }
     }
 
@@ -211,5 +225,25 @@ public class MenuScreen implements Screen {
             ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(meta.lastSavedAtEpochMs))
             : "Chưa lưu";
         return "ID: " + meta.id + "   -   Ngày: " + time;
+    }
+    private Drawable createRoundedDrawable(int width, int height, int radius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+
+        // Vẽ 2 hình chữ nhật chồng lên nhau tạo khung chữ thập
+        pixmap.fillRectangle(0, radius, width, height - 2 * radius);
+        pixmap.fillRectangle(radius, 0, width - 2 * radius, height);
+
+        // Vẽ 4 góc hình tròn
+        pixmap.fillCircle(radius, radius, radius);
+        pixmap.fillCircle(width - radius, radius, radius);
+        pixmap.fillCircle(radius, height - radius, radius);
+        pixmap.fillCircle(width - radius, height - radius, radius);
+
+        Texture texture = new Texture(pixmap);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear); // Làm mịn viền
+        pixmap.dispose();
+
+        return new TextureRegionDrawable(new TextureRegion(texture));
     }
 }
