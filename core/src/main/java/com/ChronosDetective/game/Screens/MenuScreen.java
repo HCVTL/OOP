@@ -2,9 +2,15 @@ package com.ChronosDetective.game.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle; // Đã sửa để hết bị unused
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;   // Đã sửa để hết bị unused
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -13,6 +19,7 @@ import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.ChronosDetective.game.Save.SaveRepository;
 import com.ChronosDetective.game.Save.SaveSessionMeta;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisList;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -28,20 +35,29 @@ public class MenuScreen implements Screen {
     private Stage stage;
     private final SaveRepository saves = new SaveRepository();
 
+    private BitmapFont menuFont;
+    private static final String VIETNAMESE_CHARS = "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỊĐ";
+
     public MenuScreen (ChronosDetectiveGame game) {
         this.game = game;
+
+        // 1. Khởi tạo Font Tiếng Việt và nạp vào Skin hệ thống
+        setupMenuFont();
+
         this.stage = new Stage(new FitViewport(800, 480));
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
-        table.setFillParent(true); // Bảng bao phủ toàn màn hình
+        table.setFillParent(true);
         stage.addActor(table);
 
-        VisTextButton newGameBtn = new VisTextButton("NEW GAME");
-        VisTextButton continueBtn = new VisTextButton("CONTINUE");
-        VisTextButton loadBtn = new VisTextButton("LOAD");
-        VisTextButton exitBtn = new VisTextButton("EXIT");
+        // 2. Các nút bấm sử dụng Tiếng Việt trực tiếp
+        VisTextButton newGameBtn = new VisTextButton("CHƠI MỚI");
+        VisTextButton continueBtn = new VisTextButton("TIẾP TỤC");
+        VisTextButton loadBtn = new VisTextButton("TẢI DỮ LIỆU");
+        VisTextButton exitBtn = new VisTextButton("THOÁT GAME");
 
+        // --- Cài đặt Listener ---
         newGameBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -79,18 +95,52 @@ public class MenuScreen implements Screen {
             }
         });
 
-        table.add(newGameBtn).fillX().uniformX().pad(10);
-        table.row(); // Xuống dòng
-        table.add(continueBtn).fillX().uniformX().pad(10);
+        // Thêm vào bảng điều hướng
+        table.add(newGameBtn).width(220).pad(10);
         table.row();
-        table.add(loadBtn).fillX().uniformX().pad(10);
+        table.add(continueBtn).width(220).pad(10);
         table.row();
-        table.add(exitBtn).fillX().uniformX().pad(10);
+        table.add(loadBtn).width(220).pad(10);
+        table.row();
+        table.add(exitBtn).width(220).pad(10);
+    }
+
+    private void setupMenuFont() {
+        // Nạp font từ file arial.ttf (Lưu ý đường dẫn fonts/arial.ttf trong assets)
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+
+        parameter.size = 26;
+        parameter.borderWidth = 1.2f;
+        parameter.borderColor = Color.BLACK;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + VIETNAMESE_CHARS;
+
+        menuFont = generator.generateFont(parameter);
+        generator.dispose();
+
+        // Ép font vào VisUI Skin
+        if (VisUI.isLoaded()) {
+            VisUI.getSkin().add("default-font", menuFont, BitmapFont.class);
+
+            // Cập nhật Style cho Button
+            VisTextButton.VisTextButtonStyle buttonStyle = VisUI.getSkin().get(VisTextButton.VisTextButtonStyle.class);
+            buttonStyle.font = menuFont;
+
+            // Cập nhật Style cho Label (Làm sáng dòng import LabelStyle)
+            LabelStyle labelStyle = VisUI.getSkin().get(LabelStyle.class);
+            labelStyle.font = menuFont;
+
+            // Cập nhật Style cho List (Làm sáng dòng import ListStyle)
+            ListStyle listStyle = VisUI.getSkin().get(ListStyle.class);
+            listStyle.font = menuFont;
+        }
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.2f, 1);
+        Gdx.gl.glClearColor(0.08f, 0.08f, 0.12f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(delta);
         stage.draw();
@@ -101,13 +151,18 @@ public class MenuScreen implements Screen {
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
-    @Override public void dispose() { stage.dispose(); }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+        // Không dispose menuFont ở đây vì Skin có thể vẫn cần dùng nó
+    }
 
     private void showLoadDialog() {
         ArrayList<SaveSessionMeta> sessions = saves.listSessionsNewestFirst();
 
         final VisList<String> list = new VisList<>();
-        VisDialog dialog = new VisDialog("Load session") {
+        VisDialog dialog = new VisDialog("DANH SÁCH LƯU") {
             @Override
             protected void result(Object object) {
                 boolean shouldLoad = object instanceof Boolean && (Boolean) object;
@@ -125,8 +180,8 @@ public class MenuScreen implements Screen {
         dialog.setMovable(false);
 
         if (sessions.isEmpty()) {
-            dialog.text("Chưa có session nào để load.");
-            dialog.button("Đóng", false);
+            dialog.text("Hiện chưa có dữ liệu thám tử nào.");
+            dialog.button("Quay lại", false);
             dialog.show(stage);
             return;
         }
@@ -142,10 +197,10 @@ public class MenuScreen implements Screen {
         ScrollPane scroll = new ScrollPane(list);
         scroll.setFadeScrollBars(false);
 
-        dialog.getContentTable().add(new VisLabel("Chọn session:")).left().padBottom(6).row();
-        dialog.getContentTable().add(scroll).width(520).height(220).row();
+        dialog.getContentTable().add(new VisLabel("Chọn hồ sơ vụ án:")).left().padBottom(6).row();
+        dialog.getContentTable().add(scroll).width(550).height(250).row();
 
-        dialog.button("Load", true);
+        dialog.button("Tiếp tục hồ sơ", true);
         dialog.button("Hủy", false);
 
         dialog.show(stage);
@@ -153,8 +208,8 @@ public class MenuScreen implements Screen {
 
     private String formatSessionLine(SaveSessionMeta meta) {
         String time = meta.lastSavedAtEpochMs > 0
-                ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(meta.lastSavedAtEpochMs))
-                : "chưa lưu";
-        return meta.id + "   |   " + time;
+            ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(meta.lastSavedAtEpochMs))
+            : "Chưa lưu";
+        return "ID: " + meta.id + "   -   Ngày: " + time;
     }
 }
