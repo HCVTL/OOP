@@ -32,7 +32,7 @@ public class Player extends Entity{
     private Animation<TextureRegion> idleRight;
 
     private float stateTime = 0f;
-    private final float SPEED = 100f;
+    private final float SPEED = 50f;
     private Vector2 position;
     private float width = 64, height = 64;
 

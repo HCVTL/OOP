@@ -6,7 +6,6 @@ import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.NPC;
 import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import java.util.ArrayList;
 
 public class EntityManager {
