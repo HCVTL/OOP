@@ -1,9 +1,8 @@
-package com.evocraft.game.lwjgl3;
+package com.ChronosDetective.game.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.evocraft.game.ChronosDetectiveGame;
-import com.evocraft.game.Screens.GameScreen;
+import com.ChronosDetective.game.ChronosDetectiveGame;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {

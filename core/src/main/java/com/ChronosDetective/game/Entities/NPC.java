@@ -1,6 +1,5 @@
-package com.evocraft.game.Entities;
+package com.ChronosDetective.game.Entities;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 
 public class NPC extends Entity {
     private String name;

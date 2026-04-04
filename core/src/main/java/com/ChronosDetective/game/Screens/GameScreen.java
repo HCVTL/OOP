@@ -1,4 +1,4 @@
-package com.evocraft.game.Screens;
+package com.ChronosDetective.game.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,20 +13,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.evocraft.game.ChronosDetectiveGame;
-import com.evocraft.game.Entities.Item;
-import com.evocraft.game.Entities.Player;
-import com.evocraft.game.Managers.DialogueManager;
-import com.evocraft.game.Managers.EntityManager;
-import com.evocraft.game.Managers.InventoryManager;
-import com.evocraft.game.Managers.MapManager;
-import com.evocraft.game.UI.InventoryUI;
+import com.ChronosDetective.game.ChronosDetectiveGame;
+import com.ChronosDetective.game.Entities.Player;
+import com.ChronosDetective.game.Managers.DialogueManager;
+import com.ChronosDetective.game.Managers.EntityManager;
+import com.ChronosDetective.game.Managers.InventoryManager;
+import com.ChronosDetective.game.Managers.MapManager;
+import com.ChronosDetective.game.UI.InventoryUI;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;

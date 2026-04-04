@@ -1,4 +1,4 @@
-package com.evocraft.game.Managers;
+package com.ChronosDetective.game.Managers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
@@ -7,8 +7,8 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.evocraft.game.Entities.Item;
-import com.evocraft.game.Entities.Player;
+import com.ChronosDetective.game.Entities.Item;
+import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.math.Rectangle;
 
 public class MapManager {

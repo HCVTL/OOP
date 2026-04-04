@@ -1,8 +1,8 @@
-package com.evocraft.game;
+package com.ChronosDetective.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.evocraft.game.Screens.MenuScreen;
+import com.ChronosDetective.game.Screens.MenuScreen;
 import com.kotcrab.vis.ui.VisUI;
 
 public class ChronosDetectiveGame extends Game {

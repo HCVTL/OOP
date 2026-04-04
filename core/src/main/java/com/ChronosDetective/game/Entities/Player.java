@@ -1,4 +1,4 @@
-package com.evocraft.game.Entities;
+package com.ChronosDetective.game.Entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

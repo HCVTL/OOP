@@ -1,10 +1,10 @@
-package com.evocraft.game.Managers;
+package com.ChronosDetective.game.Managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.evocraft.game.Entities.Item;
-import com.evocraft.game.Entities.NPC;
-import com.evocraft.game.Entities.Player;
+import com.ChronosDetective.game.Entities.Item;
+import com.ChronosDetective.game.Entities.NPC;
+import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;

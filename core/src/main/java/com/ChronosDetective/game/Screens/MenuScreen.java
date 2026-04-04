@@ -1,4 +1,4 @@
-package com.evocraft.game.Screens;
+package com.ChronosDetective.game.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.evocraft.game.ChronosDetectiveGame;
+import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 
 public class MenuScreen implements Screen {

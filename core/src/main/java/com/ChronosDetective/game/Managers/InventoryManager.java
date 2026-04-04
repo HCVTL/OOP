@@ -1,6 +1,6 @@
-package com.evocraft.game.Managers;
+package com.ChronosDetective.game.Managers;
 
-import com.evocraft.game.Entities.Item;
+import com.ChronosDetective.game.Entities.Item;
 import java.util.ArrayList;
 
 public class InventoryManager {

@@ -1,11 +1,11 @@
-package com.evocraft.game.UI;
+package com.ChronosDetective.game.UI;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.evocraft.game.Managers.InventoryManager;
+import com.ChronosDetective.game.Managers.InventoryManager;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.evocraft.game.Entities.Item;
+import com.ChronosDetective.game.Entities.Item;
 
 public class InventoryUI {
     private VisWindow window;
