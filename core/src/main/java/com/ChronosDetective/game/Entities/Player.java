@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity{
-    private float speed = 120f;
     private TiledMap map;
 
     private enum State {IDLE, WALKING}
@@ -32,7 +31,7 @@ public class Player extends Entity{
     private Animation<TextureRegion> idleRight;
 
     private float stateTime = 0f;
-    private final float SPEED = 60f;
+    private final float SPEED = 100f;
     private Vector2 position;
     private float width = 64, height = 64;
 

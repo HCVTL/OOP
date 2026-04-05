@@ -70,6 +70,8 @@ public class GameScreen implements Screen {
     private VisDialog exitConfirmDialog;
     private VisDialog saveDialog;
 
+    private ShapeRenderer debugRenderer;
+
     public GameScreen(ChronosDetectiveGame game) {
         this(game, new SaveRepository().createNewSessionId(), false);
     }
@@ -83,6 +85,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
+        debugRenderer = new ShapeRenderer();
 
         // 1. Setup Camera & Viewport
         camera = new OrthographicCamera();
@@ -91,8 +94,11 @@ public class GameScreen implements Screen {
         uiViewport = new FitViewport(800, 480);
         stage = new Stage(uiViewport, batch);
         // UI overlay (ESC confirm)
-        uiStage = new Stage(new FitViewport(800, 480));
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiStage));
+        uiStage = new Stage(uiViewport, batch);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
 
 
         // 3. Load Mũi tên trên item và npc
@@ -116,8 +122,6 @@ public class GameScreen implements Screen {
         camera.zoom = 0.8f;
         camera.update();
 
-        Gdx.input.setInputProcessor(stage);
-
         inventoryUI = new InventoryUI(stage);
         //Texture butlerTex = new Texture("butler.png");
         //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
@@ -135,39 +139,26 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         stage.act(delta);
         // O -> open save dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-            if (saveDialog == null || !saveDialog.isVisible()) {
-                showSaveDialog();
-            }
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-            inventoryUI.toggle(inventoryManager);
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle(inventoryManager);
         // ESC -> show confirm dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            if (exitConfirmDialog == null || !exitConfirmDialog.isVisible()) {
-                showExitConfirm();
-            }
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
 
-        boolean isExitDialogOpen = exitConfirmDialog != null && exitConfirmDialog.getStage() != null;
-        boolean isSaveDialogOpen = saveDialog != null && saveDialog.getStage() != null;
-        boolean isAnyOverlayOpen = isExitDialogOpen || isSaveDialogOpen;
+        boolean isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())
+            || inventoryUI.isVisible()
+            || dialogueManager.isActive();
 
         // 2. Cập nhật logic (Quan trọng!)
-        if (!dialogueManager.isActive() && !inventoryUI.isVisible()) { // Chỉ cập nhật khi hộp thoại và inventory không hoạt động
+        if (!isAnyOverlayOpen) {
             player.update(delta);
-
-            // KIỂM TRA CHUYỂN MAP Ở ĐÂY
+            // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
                 mapManager.loadMap(targetMap, player, x, y);
             });
         }
         entityManager.update(delta, player, dialogueManager, inventoryManager);
-
-        if (!dialogueManager.isActive() && !isAnyOverlayOpen) player.update(delta); // Chỉ cập nhật khi hộp thoại không hoạt động
-        if (!isAnyOverlayOpen) entityManager.update(delta, player, dialogueManager, inventoryManager);
 
         // 3. Cập nhật Camera đuổi theo nhân vật
         float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)
@@ -193,7 +184,6 @@ public class GameScreen implements Screen {
 
 
         // Trong GameScreen.render() sau khi vẽ batch.end()
-        ShapeRenderer debugRenderer = new ShapeRenderer();
         debugRenderer.setProjectionMatrix(camera.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.RED);
@@ -215,8 +205,6 @@ public class GameScreen implements Screen {
 
         // 3. Vẽ UI (Hộp thoại trên cùng)
         dialogueManager.draw(batch);
-
-        // Vẽ uiInventory lên trên cùng nếu đang mở
         stage.draw();
         // 4. Vẽ overlay UI (ESC confirm)
         uiStage.act(delta);
@@ -249,6 +237,7 @@ public class GameScreen implements Screen {
         pointerSprite.getTexture().dispose();
         stage.dispose();
         uiStage.dispose();
+        debugRenderer.dispose();
     }
 
     private void showExitConfirm() {
