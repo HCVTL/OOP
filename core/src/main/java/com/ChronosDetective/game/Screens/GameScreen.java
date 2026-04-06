@@ -6,9 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -20,7 +24,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.ChronosDetective.game.Entities.Item;
@@ -34,9 +46,11 @@ import com.ChronosDetective.game.Save.SaveData;
 import com.ChronosDetective.game.Save.SaveRepository;
 import com.ChronosDetective.game.Save.SaveSessionMeta;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisList;
+import com.kotcrab.vis.ui.widget.VisTextButton;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,6 +86,10 @@ public class GameScreen implements Screen {
 
     private ShapeRenderer debugRenderer;
 
+    // BIẾN CHO FONT VÀ TIẾNG VIỆT
+    private BitmapFont gameUiFont;
+    private static final String VIETNAMESE_CHARS = "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỊĐ";
+
     public GameScreen(ChronosDetectiveGame game) {
         this(game, new SaveRepository().createNewSessionId(), false);
     }
@@ -100,6 +118,8 @@ public class GameScreen implements Screen {
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
 
+        // Khởi tạo Font và Giao diện trước khi tạo Dialog
+        setupGameUiFont();
 
         // 3. Load Mũi tên trên item và npc
         Texture arrowTex = new Texture("arrow.png");
@@ -134,6 +154,48 @@ public class GameScreen implements Screen {
         }
     }
 
+    private Drawable createSolidBackground(Color color) {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fill();
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return new TextureRegionDrawable(new TextureRegion(texture));
+    }
+
+    private void setupGameUiFont() {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 22;
+        parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + VIETNAMESE_CHARS;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+
+        gameUiFont = generator.generateFont(parameter);
+        generator.dispose();
+
+        if (VisUI.isLoaded()) {
+            com.badlogic.gdx.scenes.scene2d.ui.Skin skin = VisUI.getSkin();
+            skin.add("default-font", gameUiFont, BitmapFont.class);
+
+            // Nền đen tuyền không bo góc để tránh loang lổ
+            Drawable blackBg = createSolidBackground(new Color(0, 0, 0, 1f));
+            Drawable buttonUp = createSolidBackground(new Color(0.15f, 0.15f, 0.15f, 1f));
+            Drawable buttonOver = createSolidBackground(new Color(0.25f, 0.25f, 0.25f, 1f));
+
+            WindowStyle windowStyle = skin.get(WindowStyle.class);
+            windowStyle.background = blackBg;
+            windowStyle.titleFont = gameUiFont;
+
+            TextButtonStyle btnStyle = skin.get(TextButtonStyle.class);
+            btnStyle.up = buttonUp;
+            btnStyle.over = buttonOver;
+            btnStyle.font = gameUiFont;
+
+            skin.get(LabelStyle.class).font = gameUiFont;
+            skin.get(ListStyle.class).font = gameUiFont;
+        }
+    }
 
     @Override
     public void render(float delta) {
@@ -241,26 +303,41 @@ public class GameScreen implements Screen {
     }
 
     private void showExitConfirm() {
-        exitConfirmDialog = new VisDialog("Thoát game?") {
+        exitConfirmDialog = new VisDialog("XÁC NHẬN") {
             @Override
             protected void result(Object object) {
-                try {
-                    boolean shouldExitToMenu = object instanceof Boolean && (Boolean) object;
-                    if (shouldExitToMenu) {
-                        game.setScreen(new MenuScreen(game));
-                        return;
-                    }
-                } finally {
-                    hide();
-                    exitConfirmDialog = null;
-                }
+                if (object instanceof Boolean && (Boolean) object) game.setScreen(new MenuScreen(game));
+                exitConfirmDialog = null;
             }
         };
-        exitConfirmDialog.text("Bạn có muốn thoát game không?");
-        exitConfirmDialog.button("Có", true);
-        exitConfirmDialog.button("Tiếp tục", false);
-        exitConfirmDialog.setModal(true);
-        exitConfirmDialog.setMovable(false);
+
+        // 1. Chỉnh bảng nội dung
+        Table content = exitConfirmDialog.getContentTable();
+        content.clear();
+        // Tăng Pad Bottom để chừa chỗ cho các nút bấm chui vào trong
+        content.pad(40, 50, 80, 50);
+
+        VisLabel msg = new VisLabel("Bạn có muốn tạm dừng điều tra\nvà quay về Menu chính không?");
+        msg.setAlignment(Align.center);
+        msg.setWrap(true);
+        content.add(msg).width(450).center().row();
+
+        // 2. Thêm nút bấm theo cách chuẩn của Dialog
+        VisTextButton yesBtn = new VisTextButton("THOÁT GAME");
+        VisTextButton noBtn = new VisTextButton("TIẾP TỤC");
+
+        exitConfirmDialog.button(yesBtn, true);
+        exitConfirmDialog.button(noBtn, false);
+
+        // 3. ĐƯA CÁC NÚT VÀO TRONG KHUNG
+        // Lấy bảng nút mặc định của Dialog
+        Table bTable = exitConfirmDialog.getButtonsTable();
+        // Đẩy bảng nút lên trên một chút để nó nằm trong background đen
+        bTable.padBottom(30);
+
+        bTable.getCell(yesBtn).width(180).height(50).padRight(20);
+        bTable.getCell(noBtn).width(180).height(50);
+
         exitConfirmDialog.show(uiStage);
     }
 
@@ -269,10 +346,7 @@ public class GameScreen implements Screen {
 
         boolean hasCurrent = false;
         for (SaveSessionMeta m : sessions) {
-            if (m != null && sessionId.equals(m.id)) {
-                hasCurrent = true;
-                break;
-            }
+            if (m != null && sessionId.equals(m.id)) { hasCurrent = true; break; }
         }
         if (!hasCurrent) sessions.add(0, new SaveSessionMeta(sessionId, 0));
 
@@ -283,55 +357,53 @@ public class GameScreen implements Screen {
 
         int currentIdx = 0;
         for (int i = 0; i < sessions.size(); i++) {
-            if (sessionId.equals(sessions.get(i).id)) {
-                currentIdx = i;
-                break;
-            }
+            if (sessionId.equals(sessions.get(i).id)) { currentIdx = i; break; }
         }
         list.setSelectedIndex(currentIdx);
 
-        ScrollPane scroll = new ScrollPane(list);
-        scroll.setFadeScrollBars(false);
-
-        saveDialog = new VisDialog("Save game") {
+        saveDialog = new VisDialog("LƯU GAME") {
             @Override
             protected void result(Object object) {
-                try {
-                    boolean shouldSave = object instanceof Boolean && (Boolean) object;
-                    if (!shouldSave) return;
-
+                if (object instanceof Boolean && (Boolean) object) {
                     int idx = list.getSelectedIndex();
-                    String targetSession = sessionId;
-                    if (idx >= 0 && idx < sessions.size()) targetSession = sessions.get(idx).id;
-
+                    String targetSession = (idx >= 0 && idx < sessions.size()) ? sessions.get(idx).id : sessionId;
                     SaveData data = new SaveData();
                     data.sessionId = targetSession;
                     data.playerX = player.getX();
                     data.playerY = player.getY();
                     data.savedAtEpochMs = System.currentTimeMillis();
                     saves.saveGame(data);
-                } finally {
-                    hide();
-                    saveDialog = null;
                 }
+                saveDialog = null;
             }
         };
+
+        Table content = saveDialog.getContentTable();
+        content.pad(30, 40, 30, 40);
+        content.add(new VisLabel("Chọn hồ sơ để lưu dữ liệu:")).left().padBottom(10).row();
+
+        ScrollPane scroll = new ScrollPane(list);
+        content.add(scroll).width(500).height(200).padBottom(20).row();
+
+        Table btnTable = new Table();
+        VisTextButton saveBtn = new VisTextButton("XÁC NHẬN LƯU");
+        VisTextButton cancelBtn = new VisTextButton("HỦY");
+        btnTable.add(saveBtn).width(200).height(45).padRight(15);
+        btnTable.add(cancelBtn).width(150).height(45);
+
+        saveDialog.button(saveBtn, true);
+        saveDialog.button(cancelBtn, false);
+        content.add(btnTable).center();
+
         saveDialog.setModal(true);
-        saveDialog.setMovable(false);
-
-        saveDialog.getContentTable().add(new VisLabel("Chọn session để lưu (mặc định: session hiện tại):")).left().padBottom(6).row();
-        saveDialog.getContentTable().add(scroll).width(560).height(220).row();
-
-        saveDialog.button("Lưu", true);
-        saveDialog.button("Tiếp tục", false);
         saveDialog.show(uiStage);
     }
 
     private String formatSessionLine(SaveSessionMeta meta) {
         String time = meta.lastSavedAtEpochMs > 0
-                ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(meta.lastSavedAtEpochMs))
-                : "chưa lưu";
-        String prefix = sessionId.equals(meta.id) ? "[CURRENT] " : "";
-        return prefix + meta.id + "   |   " + time;
+            ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(meta.lastSavedAtEpochMs))
+            : "Mới";
+        String prefix = sessionId.equals(meta.id) ? "[HIỆN TẠI] " : "";
+        return prefix + meta.id + " | " + time;
     }
 }

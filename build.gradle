@@ -50,7 +50,8 @@ configure(subprojects) {
   processResources.dependsOn 'generateAssetList'
 
   compileJava {
-    options.incremental = true
+    // Windows: incremental compile often fails with "Unable to delete directory" / stale outputs when files are locked.
+    options.incremental = false
   }
 }
 
