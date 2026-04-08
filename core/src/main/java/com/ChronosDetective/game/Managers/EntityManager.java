@@ -27,11 +27,11 @@ public class EntityManager {
         npcs.add(npc);
     }
 
-    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory) {
+    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory, MapManager mapManager) {
         for (Item item : items) {
             if (!item.isCollected() && player.isNear(item)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    handleItemInteraction(item, dialogueManager, inventory);
+                    handleItemInteraction(item, dialogueManager, inventory, mapManager);
                 }
             }
         }
@@ -45,14 +45,15 @@ public class EntityManager {
         }
     }
 
-    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory) {
+    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager) {
         if (!dm.isActive()) {
-            dm.startDialogue("Tham tu", "Day la " + item.getName() + ". Toi se lay no.");
+            dm.startDialogue("Thám tử", "Đây là " + item.getName() + ". Tôi sẽ lấy nó.");
         }
         else {
             dm.closeDialogue();
             item.collect();
             inventory.addItem(item);
+            mapManager.getCollectedItems().add(item.getID());
         }
     }
 

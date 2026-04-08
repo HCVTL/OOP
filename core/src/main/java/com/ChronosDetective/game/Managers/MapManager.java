@@ -1,5 +1,6 @@
 package com.ChronosDetective.game.Managers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -11,17 +12,26 @@ import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class MapManager {
     private TiledMap currentMap;
     private OrthogonalTiledMapRenderer mapRenderer;
     private EntityManager entityManager;
 
-    private Texture appleTex;
+    private Set<String> collectedItems = new HashSet<>();
+    private Map<String, Texture> itemLibrary = new HashMap<>();
+
+    private void loadItemLibrary() {
+        itemLibrary.put("apple", new Texture("apple.png"));
+    }
 
     public MapManager (EntityManager entityManager) {
         this.entityManager = entityManager;
-
-        this.appleTex = new Texture("apple.png");
+        loadItemLibrary();
     }
 
     public void loadMap(String mapPath, Player player, float spawnX, float spawnY) {
@@ -40,13 +50,40 @@ public class MapManager {
         player.setPosition(spawnX, spawnY);
 
         // Load Item/NPC riêng cho từng map
-        setupEntitiesForMap(mapPath);
+        setupEntitiesForMap(currentMap);
     }
 
-    private void setupEntitiesForMap(String mapPath) {
+    private void setupEntitiesForMap(TiledMap map) {
         entityManager.clearEntities();
-        if (mapPath.equals("map.tmx")) {
-            entityManager.addItem(new Item(appleTex, 200, 250, "Qua tao"));
+
+        MapLayer itemLayer = map.getLayers().get("Items");
+        if (itemLayer == null) return;
+
+        for (MapObject obj : itemLayer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+
+                String itemID = obj.getProperties().get("ID", String.class);
+                if (collectedItems.contains(itemID)) {
+                    continue;
+                }
+
+                String name = obj.getName();
+                String texKey = obj.getProperties().get("texture", String.class);
+                String dialogue = obj.getProperties().get("dialogue", String.class);
+
+                Texture tex = itemLibrary.get(texKey);
+
+
+                // debug
+                if (tex != null) {
+                    // Tạo item mới và thêm vào manager
+                    // Lưu ý: Tọa độ x, y lấy trực tiếp từ hình chữ nhật bạn vẽ trong Tiled
+                    entityManager.addItem(new Item(tex, rect.x, rect.y, name, itemID));
+                } else {
+                    Gdx.app.log("MapManager", "Lỗi: Không tìm thấy texture cho key: " + texKey);
+                }
+            }
         }
     }
 
@@ -73,6 +110,10 @@ public class MapManager {
                 }
             }
         }
+    }
+
+    public Set<String> getCollectedItems() {
+        return collectedItems;
     }
 
     //Giao diện để callback về GameScreen

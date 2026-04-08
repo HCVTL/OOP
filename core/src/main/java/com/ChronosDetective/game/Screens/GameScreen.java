@@ -18,11 +18,7 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
@@ -35,7 +31,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
-import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
 import com.ChronosDetective.game.Managers.DialogueManager;
 import com.ChronosDetective.game.Managers.EntityManager;
@@ -220,7 +215,7 @@ public class GameScreen implements Screen {
                 mapManager.loadMap(targetMap, player, x, y);
             });
         }
-        entityManager.update(delta, player, dialogueManager, inventoryManager);
+        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
 
         // 3. Cập nhật Camera đuổi theo nhân vật
         float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)

@@ -13,7 +13,7 @@ public class InventoryUI {
 
     public InventoryUI(Stage stage) {
         // 1. Tạo cửa sổ tiêu đề "Sổ tay vật chứng"
-        window = new VisWindow("SO TAY VAT CHUNG");
+        window = new VisWindow("SỔ TAY VẬT CHỨNG");
         window.setSize(400, 300);
         window.centerWindow(); // Hiện giữa màn hình
         window.setVisible(false); // Mặc định ẩn đi
@@ -37,7 +37,7 @@ public class InventoryUI {
         contentTable.clearChildren(); // Xóa danh sách cũ để vẽ lại
 
         if (inventory.getItems().isEmpty()) {
-            contentTable.add(new VisLabel("Chua co bang chung nao..."));
+            contentTable.add(new VisLabel("Chưa có bằng chứng nào..."));
         } else {
             for (Item item : inventory.getItems()) {
                 // Bạn có thể thêm Icon item.getTexture() vào đây nếu muốn
