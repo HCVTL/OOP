@@ -25,7 +25,7 @@ Neu van bao loi khong xoa duoc thu muc `build`, hay tat game/IDE dang mo file tr
 ## Phim dieu khien chinh
 
 - `W A S D`: di chuyen.
-- `E`: tuong tac item/NPC.
+- `E`: tuong tac item/NPC; trong `kitchen.tmx` dung gan cua se hien goi y mo/dong cua, cua dong thi bi chan khong cho di vao.
 - `O`: mo form Save game.
 - `ESC`: mo form hoi thoat game (ve menu neu chon "Co").
 
