@@ -137,7 +137,7 @@ public class GameScreen implements Screen {
         camera.zoom = 0.8f;
         camera.update();
 
-        inventoryUI = new InventoryUI(stage);
+        inventoryUI = new InventoryUI();
         //Texture butlerTex = new Texture("butler.png");
         //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
 
@@ -198,7 +198,10 @@ public class GameScreen implements Screen {
         // O -> open save dialog
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle(inventoryManager);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle();
+        if (inventoryUI.isVisible()) {
+            inventoryUI.handleInput();
+        }
         // ESC -> show confirm dialog
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
 
@@ -262,6 +265,7 @@ public class GameScreen implements Screen {
 
         // 3. Vẽ UI (Hộp thoại trên cùng)
         dialogueManager.draw(batch);
+        inventoryUI.draw(batch, debugRenderer, uiViewport, inventoryManager, gameUiFont);
         stage.draw();
         // 4. Vẽ overlay UI (ESC confirm)
         uiStage.act(delta);

@@ -49,5 +49,7 @@ public class Item extends Entity{
         return name;
     }
 
+    public Texture getTexture() { return sprite.getTexture();}
+
     public String getID() { return ID;}
 }
