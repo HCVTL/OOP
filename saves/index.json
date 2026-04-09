@@ -1,9 +1,13 @@
 {
-"lastSessionId": "e4682c87-35ae-42e7-baab-f31ef45f2f33",
+"lastSessionId": "2ee80d78-90d4-48cd-8b58-07f72f9e04f6",
 "sessions": [
 	{
 		"id": "8a2d21c9-7d86-4b9d-8500-90e0f10679c8",
 		"lastSavedAtEpochMs": 1775405036599
+	},
+	{
+		"id": "2ee80d78-90d4-48cd-8b58-07f72f9e04f6",
+		"lastSavedAtEpochMs": 1775743818527
 	}
 ]
 }
