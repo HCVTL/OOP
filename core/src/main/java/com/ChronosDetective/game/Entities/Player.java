@@ -137,19 +137,21 @@ public class Player extends Entity{
     }
 
     public boolean isCollision(float worldX, float worldY) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Fences");
-        if (layer == null) return false;
+        TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
+        TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
+        if (fenceLayer == null && doorBlockLayer == null) return false;
 
         int tileX = (int)(worldX / 16);
         int tileY = (int)(worldY / 16);
 
-        TiledMapTileLayer.Cell cell = layer.getCell(tileX, tileY);
-
-        if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) {
+        TiledMapTileLayer refLayer = (fenceLayer != null) ? fenceLayer : doorBlockLayer;
+        if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
             return true;
         }
 
-        return cell != null;
+        boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
+        boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
+        return blockedByFence || blockedByDoor;
     }
 
     private boolean checkCollisionAtPoints(float x, float y) {

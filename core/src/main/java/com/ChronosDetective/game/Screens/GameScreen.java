@@ -195,23 +195,34 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         stage.act(delta);
-        // O -> open save dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle();
-        if (inventoryUI.isVisible()) {
-            inventoryUI.handleInput();
-        }
-        // ESC -> show confirm dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
 
         boolean isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
             || (saveDialog != null && saveDialog.isVisible())
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
+        // O -> open save dialog (chi mo khi chua co overlay nao)
+        if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle();
+        if (inventoryUI.isVisible()) {
+            inventoryUI.handleInput();
+        }
+        // ESC -> show confirm dialog (chi mo khi chua co overlay nao)
+        if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
+
+        isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())
+            || inventoryUI.isVisible()
+            || dialogueManager.isActive();
+
+        mapManager.update(delta);
+
         // 2. Cập nhật logic (Quan trọng!)
         if (!isAnyOverlayOpen) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                mapManager.tryToggleKitchenDoor(player);
+            }
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
@@ -237,9 +248,16 @@ public class GameScreen implements Screen {
         }
 
         batch.setProjectionMatrix(camera.combined);
+        // Reset mau batch moi frame de tranh bi UI/dialog de lai alpha khac 1
+        batch.setColor(Color.WHITE);
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
+            if (mapManager.shouldShowKitchenDoorHint(player)) {
+                gameUiFont.setColor(Color.YELLOW);
+                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
+                gameUiFont.setColor(Color.WHITE);
+            }
         batch.end();
 
 
@@ -302,6 +320,9 @@ public class GameScreen implements Screen {
     }
 
     private void showExitConfirm() {
+        if ((exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())) return;
+
         exitConfirmDialog = new VisDialog("XÁC NHẬN") {
             @Override
             protected void result(Object object) {
@@ -341,6 +362,9 @@ public class GameScreen implements Screen {
     }
 
     private void showSaveDialog() {
+        if ((saveDialog != null && saveDialog.isVisible())
+            || (exitConfirmDialog != null && exitConfirmDialog.isVisible())) return;
+
         final ArrayList<SaveSessionMeta> sessions = saves.listSessionsNewestFirst();
 
         boolean hasCurrent = false;
