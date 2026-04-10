@@ -1,0 +1,11 @@
+.classpath
+.project
+
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+
+
+.DS_Store
+/saves/
