@@ -58,6 +58,7 @@ public class MapManager {
     };
 
     private void loadItemLibrary() {
+
         itemLibrary.put("apple", new Texture("apple.png"));
     }
 
