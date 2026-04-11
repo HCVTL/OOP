@@ -27,58 +27,33 @@ public class EntityManager {
         npcs.add(npc);
     }
 
-    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory) {
-        // 1. Kiểm tra xem Dialogue có đang mở không
-    if (dialogueManager.isActive()) {
-        // Nếu đang mở mà bấm E thì chỉ lo việc đóng nó lại thôi, không làm gì khác
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            // Tìm xem đang tương tác với Item hay NPC nào để xử lý đóng
-            handleClosingInteraction(dialogueManager, items, inventory, player);
-        }
-        return; // Thoát hàm luôn, không cho phép kích hoạt mở mới trong cùng 1 frame
-    }
+    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory, MapManager mapManager) {
         for (Item item : items) {
             if (!item.isCollected() && player.isNear(item)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                   dialogueManager.startDialogue("Thám tử", "Đây là " + item.getName() + ". Tôi sẽ lấy nó.");
-                    return;
+                    handleItemInteraction(item, dialogueManager, inventory, mapManager);
                 }
             }
         }
 
-       for (NPC npc : npcs) {
-        if (player.isNear(npc)) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                dialogueManager.startDialogue(npc.getName(), npc.getDialogue());
-                return;
+        for (NPC npc : npcs) {
+            if (player.isNear(npc)) {
+                if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                    handleNPCInteraction(npc, dialogueManager);
                 }
             }
         }
     }
-    // Hàm phụ để xử lý việc đóng hội thoại và nhặt đồ
-private void handleClosingInteraction(DialogueManager dm, ArrayList<Item> items, InventoryManager inv, Player player) {
-    dm.closeDialogue();
-    
-    // Kiểm tra xem có item nào ở gần mà thám tử vừa mới "đọc" xong không để thu hồi
-    for (Item item : items) {
-        if (!item.isCollected() && player.isNear(item)) {
-            item.collect();
-            inv.addItem(item);
-            player.addItem(item.getName().toLowerCase());
-            break; 
-        }
-    }
-}
 
-    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, Player player) {
+    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager) {
         if (!dm.isActive()) {
-            dm.startDialogue("Tham tu", "Day la " + item.getName() + ". Toi se lay no.");
+            dm.startDialogue("Thám tử", "Đây là " + item.getName() + ". Tôi sẽ lấy nó.");
         }
         else {
             dm.closeDialogue();
             item.collect();
             inventory.addItem(item);
-            player.addItem(item.getName().toLowerCase());
+            mapManager.getCollectedItems().add(item.getID());
         }
     }
 
@@ -114,7 +89,4 @@ private void handleClosingInteraction(DialogueManager dm, ArrayList<Item> items,
         items.clear();
         npcs.clear();
     }
-    public ArrayList<Item> getItems() {
-    return items;
-}
 }

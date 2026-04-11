@@ -1,3 +1,4 @@
+AssetPack_V01_FREE.png
 Player_animation.png
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/ATTRIBUTION.md
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/LICENSE.txt
@@ -58,6 +59,9 @@ Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/plugin.cfg
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/sprout_lands_tilemap.gd
 apple.png
 arrow.png
+cafe.tsx
+door.tsx
+floor.tsx
 fonts/ARIALN.TTF
 fonts/ARIALNB.TTF
 fonts/ARIALNBI.TTF
@@ -68,7 +72,11 @@ fonts/arialbd.ttf
 fonts/arialbi.ttf
 fonts/ariali.ttf
 fonts/ariblk.ttf
+funiture1.tsx
+funiture2.tsx
+funiture3.tsx
 kitchen.tmx
+kitchen.tmx.tmx
 libgdx.png
 libs/gdx-freetype-1.12.1.jar
 libs/gdx-freetype-platform-1.12.1-natives-desktop.jar
@@ -89,6 +97,9 @@ map_Kitchen/pixelinterior_LRK_v1.1/kitchen_LRK.png
 map_Kitchen/pixelinterior_LRK_v1.1/license.txt
 map_Kitchen/pixelinterior_LRK_v1.1/livingroom_LRK.png
 map_Kitchen/tables.tsx
+pixelinterior_BR_v1.1.zip
+pixelinterior_LRK_v1.1.zip
+player.png
 player2.png
 saves/1a00d5ff-a84e-4c50-970a-60e1ac15ca39.json
 saves/index.json

@@ -93,9 +93,6 @@ public class GameScreen implements Screen {
     public GameScreen(ChronosDetectiveGame game) {
         this(game, new SaveRepository().createNewSessionId(), false);
     }
-    private boolean showSimpleInventory = false;
-    private int selectedSlot = 0;
-    private Texture appleIcon;
     public GameScreen(ChronosDetectiveGame game, String sessionId, boolean loadOnStart) {
         this.game = game;
         this.sessionId = sessionId;
@@ -144,7 +141,7 @@ public class GameScreen implements Screen {
         camera.zoom = 0.8f;
         camera.update();
 
-        inventoryUI = new InventoryUI(stage);
+        inventoryUI = new InventoryUI();
         //Texture butlerTex = new Texture("butler.png");
         //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
 
@@ -202,42 +199,42 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         stage.act(delta);
-        // O -> open save dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle(inventoryManager);
-        // ESC -> show confirm dialog
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
-    // bấm I để mở
-    if (Gdx.input.isKeyJustPressed(Input.Keys.I)) { 
-            showSimpleInventory = !showSimpleInventory;
+        boolean isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())
+            || inventoryUI.isVisible()
+            || dialogueManager.isActive();
+
+        // O -> open save dialog (chi mo khi chua co overlay nao)
+        if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle();
+        if (inventoryUI.isVisible()) {
+            inventoryUI.handleInput();
         }
-        if (showSimpleInventory) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) selectedSlot = (selectedSlot + 1) % 8;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) selectedSlot = (selectedSlot - 1 + 8) % 8;
-        }
+        // ESC -> show confirm dialog (chi mo khi chua co overlay nao)
+        if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
 
-       // 1. Chia làm 2 loại khóa: Khóa di chuyển và Khóa hệ thống
-        boolean isMenuOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
-                || (saveDialog != null && saveDialog.isVisible());
+        isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())
+            || inventoryUI.isVisible()
+            || dialogueManager.isActive();
 
-        boolean isMovementBlocked = isMenuOpen 
-                || inventoryUI.isVisible() 
-                || dialogueManager.isActive() 
-                || showSimpleInventory;
+        mapManager.update(delta);
 
-        // 2. Cập nhật Player & Portal (Chặn khi đang nói chuyện/mở túi đồ)
-        if (!isMovementBlocked) {
+        // 2. Cập nhật logic (Quan trọng!)
+        if (!isAnyOverlayOpen) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                mapManager.tryToggleKitchenDoor(player);
+            }
             player.update(delta);
+            // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
                 mapManager.loadMap(targetMap, player, x, y);
             });
         }
+        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
 
-        // 3. Cập nhật Tương tác (Phải chạy khi đang nói chuyện để bấm E mà đóng)
-        if (!isMenuOpen) {
-            entityManager.update(delta, player, dialogueManager, inventoryManager);
-        }
         // 3. Cập nhật Camera đuổi theo nhân vật
         float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)
         camera.position.x += (player.getX() - camera.position.x) * lerp;
@@ -255,9 +252,16 @@ public class GameScreen implements Screen {
         }
 
         batch.setProjectionMatrix(camera.combined);
+        // Reset mau batch moi frame de tranh bi UI/dialog de lai alpha khac 1
+        batch.setColor(Color.WHITE);
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
+            if (mapManager.shouldShowKitchenDoorHint(player)) {
+                gameUiFont.setColor(Color.YELLOW);
+                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
+                gameUiFont.setColor(Color.WHITE);
+            }
         batch.end();
 
 
@@ -283,13 +287,11 @@ public class GameScreen implements Screen {
 
         // 3. Vẽ UI (Hộp thoại trên cùng)
         dialogueManager.draw(batch);
+        inventoryUI.draw(batch, debugRenderer, uiViewport, inventoryManager, gameUiFont);
         stage.draw();
         // 4. Vẽ overlay UI (ESC confirm)
         uiStage.act(delta);
         uiStage.draw();
-        if (showSimpleInventory) {
-            drawSimpleInventoryUI();
-        }
     }
 
     @Override
@@ -322,6 +324,9 @@ public class GameScreen implements Screen {
     }
 
     private void showExitConfirm() {
+        if ((exitConfirmDialog != null && exitConfirmDialog.isVisible())
+            || (saveDialog != null && saveDialog.isVisible())) return;
+
         exitConfirmDialog = new VisDialog("XÁC NHẬN") {
             @Override
             protected void result(Object object) {
@@ -361,6 +366,9 @@ public class GameScreen implements Screen {
     }
 
     private void showSaveDialog() {
+        if ((saveDialog != null && saveDialog.isVisible())
+            || (exitConfirmDialog != null && exitConfirmDialog.isVisible())) return;
+
         final ArrayList<SaveSessionMeta> sessions = saves.listSessionsNewestFirst();
 
         boolean hasCurrent = false;
@@ -424,68 +432,5 @@ public class GameScreen implements Screen {
             : "Mới";
         String prefix = sessionId.equals(meta.id) ? "[HIỆN TẠI] " : "";
         return prefix + meta.id + " | " + time;
-    }
-    //vẽ tui đồ
-   private void drawSimpleInventoryUI() {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        debugRenderer.setProjectionMatrix(uiViewport.getCamera().combined);
-        batch.setProjectionMatrix(uiViewport.getCamera().combined);
-
-        float pW = 340, pH = 400; 
-        float sX = (800 - pW) / 2;
-        float sY = (480 - pH) / 2;
-
-        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        debugRenderer.setColor(new Color(0, 0, 0, 0.85f));
-        debugRenderer.rect(sX, sY, pW, pH);
-        debugRenderer.setColor(new Color(0.15f, 0.15f, 0.15f, 1));
-        debugRenderer.rect(sX + 15, sY + 185, pW - 30, 195); 
-        debugRenderer.end();
-
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        float slotSize = 55, pad = 15;
-        float gX = sX + 35, gY = sY + 35;
-        for (int i = 0; i < 8; i++) {
-            int row = i / 4; int col = i % 4;
-            float x = gX + col * (slotSize + pad);
-            float y = gY + (1 - row) * (slotSize + pad);
-            debugRenderer.setColor(i == selectedSlot ? Color.GOLD : Color.GRAY);
-            debugRenderer.rect(x, y, slotSize, slotSize);
-        }
-        debugRenderer.end();
-
-        batch.begin();
-        if (appleIcon == null) appleIcon = new Texture("apple.png");
-        
-        ArrayList<String> items = player.getInventory(); 
-        
-        // 1. XỬ LÝ TÊN HIỂN THỊ (VIỆT HÓA)
-        if (selectedSlot < items.size()) {
-            String rawName = items.get(selectedSlot).toLowerCase();
-            String displayName = rawName; // Mặc định dùng tên gốc
-
-            // Nếu trong code là "apple" hoặc "qua tao" thì hiện "QUẢ TÁO"
-            if (rawName.contains("apple") || rawName.contains("tao")) {
-                displayName = "QUẢ TÁO";
-            }
-
-            gameUiFont.setColor(Color.GOLD);
-            gameUiFont.draw(batch, "VẬT CHỨNG: " + displayName, sX + 30, sY + 360);
-        }
-
-        // 2. XỬ LÝ VẼ HÌNH ẢNH
-        for (int i = 0; i < items.size(); i++) {
-            int row = i / 4; int col = i % 4;
-            float x = gX + col * (slotSize + pad);
-            float y = gY + (1 - row) * (slotSize + pad);
-            
-            String itemName = items.get(i).toLowerCase();
-
-            // Nếu tên chứa "apple" HOẶC "tao" thì đều vẽ hình quả táo
-            if (itemName.contains("apple") || itemName.contains("tao")) {
-                batch.draw(appleIcon, x + 5, y + 5, slotSize - 10, slotSize - 10);
-            }
-        }
-        batch.end();
     }
 }

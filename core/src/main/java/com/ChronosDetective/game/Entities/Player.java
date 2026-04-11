@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
 
 public class Player extends Entity{
     private TiledMap map;
@@ -35,7 +34,7 @@ public class Player extends Entity{
     private final float SPEED = 100f;
     private Vector2 position;
     private float width = 64, height = 64;
-    private ArrayList<String> inventory = new ArrayList<>(); // Danh sách đồ thực tế
+
     public Player(Texture texture, float x, float y, TiledMap map) {
         super(texture, x, y);
         this.position = new Vector2(x, y);
@@ -138,19 +137,21 @@ public class Player extends Entity{
     }
 
     public boolean isCollision(float worldX, float worldY) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Fences");
-        if (layer == null) return false;
+        TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
+        TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
+        if (fenceLayer == null && doorBlockLayer == null) return false;
 
         int tileX = (int)(worldX / 16);
         int tileY = (int)(worldY / 16);
 
-        TiledMapTileLayer.Cell cell = layer.getCell(tileX, tileY);
-
-        if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) {
+        TiledMapTileLayer refLayer = (fenceLayer != null) ? fenceLayer : doorBlockLayer;
+        if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
             return true;
         }
 
-        return cell != null;
+        boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
+        boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
+        return blockedByFence || blockedByDoor;
     }
 
     private boolean checkCollisionAtPoints(float x, float y) {
@@ -207,11 +208,4 @@ public class Player extends Entity{
     public void dispose() {
         sprite.getTexture().dispose();
     }
-    public ArrayList<String> getInventory() {
-    return inventory; // Trả về túi đồ thật, ban đầu sẽ rỗng
 }
-public void addItem(String itemName) {
-    inventory.add(itemName);
-}
-}
-

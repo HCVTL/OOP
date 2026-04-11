@@ -1,53 +1,86 @@
 package com.ChronosDetective.game.UI;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.ChronosDetective.game.Managers.InventoryManager;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisWindow;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.Entities.Item;
 
+import java.util.ArrayList;
+
 public class InventoryUI {
-    private VisWindow window;
-    private VisTable contentTable;
+    private boolean visible = false;
+    private int selectedSlot = 0;
+    private float pW = 340, pH = 400; // Kích thước bảng
 
-    public InventoryUI(Stage stage) {
-        // 1. Tạo cửa sổ tiêu đề "Sổ tay vật chứng"
-        window = new VisWindow("SO TAY VAT CHUNG");
-        window.setSize(400, 300);
-        window.centerWindow(); // Hiện giữa màn hình
-        window.setVisible(false); // Mặc định ẩn đi
-
-        // 2. Tạo bảng nội dung bên trong
-        contentTable = new VisTable();
-        window.add(contentTable).expand().fill().top().pad(10);
-
-        stage.addActor(window);
+    public void toggle() {
+        visible = !visible;
     }
 
-    public void toggle(InventoryManager inventory) {
-        window.setVisible(!window.isVisible());
-        if (window.isVisible()) {
-            updateList(inventory);
-            window.toFront(); // Đưa cửa sổ lên trên cùng
+    public boolean isVisible() {
+        return visible;
+    }
+
+    // Hàm vẽ chính - Gọi trong GameScreen.render()
+    public void draw(SpriteBatch batch, ShapeRenderer debugRenderer, FitViewport uiViewport, InventoryManager manager, BitmapFont font) {
+        if (!visible) return;
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        debugRenderer.setProjectionMatrix(uiViewport.getCamera().combined);
+        batch.setProjectionMatrix(uiViewport.getCamera().combined);
+
+        float sX = (uiViewport.getWorldWidth() - pW) / 2;
+        float sY = (uiViewport.getWorldHeight() - pH) / 2;
+
+        // 1. Vẽ nền (Background)
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        debugRenderer.setColor(new Color(0, 0, 0, 0.85f));
+        debugRenderer.rect(sX, sY, pW, pH);
+        debugRenderer.setColor(new Color(0.15f, 0.15f, 0.15f, 1));
+        debugRenderer.rect(sX + 15, sY + 185, pW - 30, 195);
+        debugRenderer.end();
+
+        // 2. Vẽ các ô Slot
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        float slotSize = 55, pad = 15;
+        float gX = sX + 35, gY = sY + 35;
+        for (int i = 0; i < 8; i++) {
+            int row = i / 4; int col = i % 4;
+            float x = gX + col * (slotSize + pad);
+            float y = gY + (1 - row) * (slotSize + pad);
+            debugRenderer.setColor(i == selectedSlot ? Color.GOLD : Color.GRAY);
+            debugRenderer.rect(x, y, slotSize, slotSize);
         }
-    }
+        debugRenderer.end();
 
-    private void updateList(InventoryManager inventory) {
-        contentTable.clearChildren(); // Xóa danh sách cũ để vẽ lại
+        // 3. Vẽ Item và Text
+        batch.begin();
+        ArrayList<Item> items = manager.getItems();
 
-        if (inventory.getItems().isEmpty()) {
-            contentTable.add(new VisLabel("Chua co bang chung nao..."));
-        } else {
-            for (Item item : inventory.getItems()) {
-                // Bạn có thể thêm Icon item.getTexture() vào đây nếu muốn
-                contentTable.add(new VisLabel("- " + item.getName())).left();
-                contentTable.row();
-            }
+        if (selectedSlot < items.size()) {
+            String displayName = items.get(selectedSlot).getName().toUpperCase();
+            font.setColor(Color.GOLD);
+            font.draw(batch, "VẬT CHỨNG: " + displayName, sX + 30, sY + 360);
         }
-        window.setSize(400, 300);
-        window.centerWindow();
+
+        for (int i = 0; i < items.size(); i++) {
+            int row = i / 4; int col = i % 4;
+            float x = gX + col * (slotSize + pad);
+            float y = gY + (1 - row) * (slotSize + pad);
+
+            // Lấy trực tiếp Texture từ Item trong kho
+            batch.draw(items.get(i).getTexture(), x + 5, y + 5, slotSize - 10, slotSize - 10);
+        }
+        batch.end();
     }
 
-    public boolean isVisible() { return window.isVisible(); }
+    public void handleInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) selectedSlot = (selectedSlot + 1) % 8;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) selectedSlot = (selectedSlot - 1 + 8) % 8;
+    }
 }

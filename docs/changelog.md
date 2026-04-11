@@ -15,6 +15,7 @@ Mọi thay đổi đáng chú ý của dự án được ghi ở đây. Định 
 
 - Đổi namespace/package cũ sang `com.ChronosDetective...` ở `core` và `lwjgl3`.
 - Nâng cấp `run-game.bat`: trước khi chạy game sẽ tự tìm và kill instance game cũ (`Lwjgl3Launcher`) rồi mới `gradlew lwjgl3:run`, giúp reload bản mới nhanh hơn khi dev.
+- `MapManager` + `GameScreen`: thêm animation mở cửa nhà bếp khi đứng gần cửa và bấm **E** (chạy theo nhiều frame tile trên layer `door` của `kitchen.tmx`), đồng thời hiển thị gợi ý mở cửa và chặn qua portal khi cửa còn đóng.
 - `MenuScreen`: thêm luồng **CONTINUE** (resume session gần nhất) và **LOAD** (chọn session để load).
 - `GameScreen`: bấm **O** mở form save (chọn session + lưu), bấm **ESC** xác nhận thoát về menu.
 

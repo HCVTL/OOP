@@ -42,6 +42,7 @@ Assets: `assets/` (ví dụ `map.tmx`, `player2.png`, `apple.png`, `arrow.png`).
 - Màn hình libGDX: `show` khởi tạo, `render` cập nhật + vẽ, `dispose` giải phóng texture/batch/map/font/shape.
 - Va chạm player: layer Tiled `"Fences"`, tile 16px (xem `Player.isCollision`).
 - Tương tác: phím **E** qua `EntityManager`; khi dialogue bật, `GameScreen` không gọi `player.update`.
+- Riêng `kitchen.tmx`: phím **E** gần cửa sẽ hiển thị gợi ý mở cửa, kích hoạt animation mở cửa (xử lý tại `MapManager`), và cửa đóng thì chưa qua portal.
 
 ## Việc nên kiểm tra sau thay đổi
 
