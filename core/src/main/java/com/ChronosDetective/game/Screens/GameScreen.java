@@ -220,13 +220,8 @@ public class GameScreen implements Screen {
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
-        mapManager.update(delta);
-
         // 2. Cập nhật logic (Quan trọng!)
         if (!isAnyOverlayOpen) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                mapManager.tryToggleKitchenDoor(player);
-            }
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
@@ -257,11 +252,6 @@ public class GameScreen implements Screen {
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
-            if (mapManager.shouldShowKitchenDoorHint(player)) {
-                gameUiFont.setColor(Color.YELLOW);
-                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
-                gameUiFont.setColor(Color.WHITE);
-            }
         batch.end();
 
 
@@ -271,7 +261,7 @@ public class GameScreen implements Screen {
         debugRenderer.setColor(Color.RED);
 
         // Vẽ thử cái khung của Portal
-        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
         for (MapObject obj : layer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();

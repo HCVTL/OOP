@@ -137,21 +137,30 @@ public class Player extends Entity{
     }
 
     public boolean isCollision(float worldX, float worldY) {
-        TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
-        TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
-        if (fenceLayer == null && doorBlockLayer == null) return false;
+        // 1. Danh sách tất cả các lớp vật cản
+        String[] solidLayers = {"Wall", "Fences", "Decor"};
 
         int tileX = (int)(worldX / 16);
         int tileY = (int)(worldY / 16);
 
-        TiledMapTileLayer refLayer = (fenceLayer != null) ? fenceLayer : doorBlockLayer;
-        if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
-            return true;
+        for (String name : solidLayers) {
+            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(name);
+
+            // Nếu map không có lớp này thì bỏ qua, tìm lớp tiếp theo
+            if (layer == null) continue;
+
+            // 2. Check giới hạn bản đồ dựa trên lớp đang xét
+            if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) {
+                return true; // Chặn nếu đi ra ngoài biên
+            }
+
+            // 3. Nếu tại ô gạch này có Tile (Cell != null) -> Có vật cản
+            if (layer.getCell(tileX, tileY) != null) {
+                return true; // Chỉ cần chạm 1 lớp là đủ để chặn lại
+            }
         }
 
-        boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
-        boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
-        return blockedByFence || blockedByDoor;
+        return false; // Đi xuyên qua thoải mái nếu không chạm lớp nào
     }
 
     private boolean checkCollisionAtPoints(float x, float y) {
