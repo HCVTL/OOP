@@ -1,6 +1,5 @@
 package com.ChronosDetective.game.Screens;
 
-import com.ChronosDetective.game.Entities.Item;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -137,53 +136,21 @@ public class GameScreen implements Screen {
         Texture playerTexture = new Texture("player_animation.png");
         player = new Player(playerTexture, 100, 100, null); // Cho player đứng ở (100,100)
 
+        mapManager.loadMap("map.tmx", player, 100, 100);
+
+        camera.zoom = 0.8f;
+        camera.update();
+
         inventoryUI = new InventoryUI();
         //Texture butlerTex = new Texture("butler.png");
         //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
 
-        // 6. CHUẨN BỊ THÔNG SỐ MẶC ĐỊNH (Dành cho New Game)
-        String mapPathToLoad = "map.tmx";
-        String mapNameToLoad = "map.tmx";
-        float startX = 100;
-        float startY = 100;
-
-        // 7. ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU (TRƯỚC KHI LOAD MAP)
         if (loadOnStart) {
             SaveData data = saves.loadGame(sessionId);
             if (data != null) {
-                // Lấy lại tọa độ
-                startX = data.playerX;
-                startY = data.playerY;
-
-                // Lấy lại Map
-                if (data.currentMapName != null && !data.currentMapName.isEmpty()) {
-                    mapNameToLoad = data.currentMapName;
-                    mapPathToLoad = data.currentMapName;
-                }
-
-                // Truyền danh sách ID đồ ĐÃ NHẶT cho MapManager
-                if (data.collectedItemIds != null) {
-                    mapManager.setCollectedItems(data.collectedItemIds);
-                }
-
-                // Phục hồi TÚI ĐỒ cho InventoryManager
-                if (data.inventoryItemIds != null) {
-                    for (String itemId : data.inventoryItemIds) {
-                        Item restoredItem = mapManager.createItemFromId(itemId);
-                        if (restoredItem != null) {
-                            restoredItem.collect(); // Đánh dấu đã nhặt để không vẽ ra màn hình
-                            inventoryManager.addItem(restoredItem);
-                        }
-                    }
-                }
+                player.setPosition(data.playerX, data.playerY);
             }
         }
-
-        // 8. CUỐI CÙNG MỚI LOAD MAP (Gọi hàm với 5 tham số)
-        mapManager.loadMap(mapPathToLoad, mapNameToLoad, player, startX, startY);
-
-        camera.zoom = 0.8f;
-        camera.update();
     }
 
     private Drawable createSolidBackground(Color color) {
@@ -253,12 +220,17 @@ public class GameScreen implements Screen {
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
+        mapManager.update(delta);
+
         // 2. Cập nhật logic (Quan trọng!)
         if (!isAnyOverlayOpen) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                mapManager.tryToggleKitchenDoor(player);
+            }
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
-                mapManager.loadMap(targetMap,targetMap, player, x, y);
+                mapManager.loadMap(targetMap, player, x, y);
             });
         }
         entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
@@ -285,6 +257,11 @@ public class GameScreen implements Screen {
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
+            if (mapManager.shouldShowKitchenDoorHint(player)) {
+                gameUiFont.setColor(Color.YELLOW);
+                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
+                gameUiFont.setColor(Color.WHITE);
+            }
         batch.end();
 
 
@@ -294,7 +271,7 @@ public class GameScreen implements Screen {
         debugRenderer.setColor(Color.RED);
 
         // Vẽ thử cái khung của Portal
-        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
         for (MapObject obj : layer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
@@ -422,16 +399,6 @@ public class GameScreen implements Screen {
                     data.playerX = player.getX();
                     data.playerY = player.getY();
                     data.savedAtEpochMs = System.currentTimeMillis();
-                    // 1. Lưu tên Map (Bạn cần viết thêm hàm getCurrentMapName() trong MapManager)
-                    data.currentMapName = mapManager.getCurrentMapName();
-
-                    // 2. Lưu ID các item đã bị nhặt trên map (khỏi hiện lại)
-                    data.collectedItemIds.addAll(mapManager.getCollectedItems());
-
-                    // 3. Lưu ID các item đang có trong túi đồ
-                    for (Item item : inventoryManager.getItems()) {
-                        data.inventoryItemIds.add(item.getID());
-                    }
                     saves.saveGame(data);
                 }
                 saveDialog = null;
