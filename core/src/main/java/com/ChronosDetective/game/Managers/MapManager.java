@@ -128,7 +128,7 @@ public class MapManager {
 
     public  void checkPortals(Player player, MapTransitionListener listener) {
         // Lấy vùng để xử lý logic chuyển map
-        MapLayer layer = currentMap.getLayers().get("Doors");
+        MapLayer layer = currentMap.getLayers().get("Door");
 
         if (layer == null) {
             System.out.println("Lỗi: Không tìm thấy lớp nào tên Door");
