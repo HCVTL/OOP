@@ -36,6 +36,7 @@ public class MapManager {
 
         itemLibrary.put("apple", new Texture("apple.png"));
         itemLibrary.put("cafe", new Texture("cafe.png"));
+        itemLibrary.put("key_item", new Texture("key.png"));
     }
 
     public MapManager (EntityManager entityManager) {
@@ -131,6 +132,10 @@ public class MapManager {
 
     public Set<String> getCollectedItems() {
         return collectedItems;
+    }
+
+    public Map<String, Texture> getItemLibrary() {
+        return itemLibrary;
     }
 
     public void setCollectedItems(ArrayList<String> savedItems) {
