@@ -137,23 +137,32 @@ public class Player extends Entity{
     }
 
     public boolean isCollision(float worldX, float worldY) {
-        TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
-        TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
-        if (fenceLayer == null && doorBlockLayer == null) return false;
+    // 1. Lấy đúng tên các Layer từ ảnh Tiled của thám tử
+    TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
+    TiledMapTileLayer wallLayer = (TiledMapTileLayer) map.getLayers().get("Wall");    // Chữ W viết hoa
+    TiledMapTileLayer decorLayer = (TiledMapTileLayer) map.getLayers().get("Decor");  // Tên mới theo ảnh
+    TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
 
-        int tileX = (int)(worldX / 16);
-        int tileY = (int)(worldY / 16);
+    // 2. Chuyển đổi tọa độ
+    int tileX = (int)(worldX / 16);
+    int tileY = (int)(worldY / 16);
 
-        TiledMapTileLayer refLayer = (fenceLayer != null) ? fenceLayer : doorBlockLayer;
-        if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
-            return true;
-        }
+    // 3. Kiểm tra an toàn để không bị crash game
+    TiledMapTileLayer refLayer = (wallLayer != null) ? wallLayer : (decorLayer != null ? decorLayer : fenceLayer);
+    if (refLayer == null) return false;
 
-        boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
-        boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
-        return blockedByFence || blockedByDoor;
+    if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
+        return true;
     }
 
+    // 4. Logic kiểm tra va chạm
+    boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
+    boolean blockedByWall = wallLayer != null && wallLayer.getCell(tileX, tileY) != null;
+    boolean blockedByDecor = decorLayer != null && decorLayer.getCell(tileX, tileY) != null;
+    boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
+
+    return blockedByFence || blockedByWall || blockedByDecor || blockedByDoor;
+}
     private boolean checkCollisionAtPoints(float x, float y) {
         float pX = 20f;
         float pY = 10f;

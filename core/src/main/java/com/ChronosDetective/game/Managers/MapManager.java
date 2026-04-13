@@ -60,6 +60,9 @@ public class MapManager {
     private void loadItemLibrary() {
 
         itemLibrary.put("apple", new Texture("apple.png"));
+        itemLibrary.put("takecafe", new Texture("cafe.png"));
+        itemLibrary.put("key_item", new Texture("key.png"));
+        itemLibrary.put("none", new Texture("invisible.png"));
     }
 
     public MapManager (EntityManager entityManager) {
@@ -72,10 +75,10 @@ public class MapManager {
 
         currentMap = new TmxMapLoader().load(mapPath);
         currentMapPath = mapPath;
-        resetKitchenDoorState();
-        detectKitchenDoorBounds();
-        setupKitchenDoorCollisionRect();
-        syncKitchenDoorCollision();
+        //resetKitchenDoorState();
+       // detectKitchenDoorBounds();
+        //setupKitchenDoorCollisionRect();
+        //syncKitchenDoorCollision();
         if (mapRenderer == null) {
             mapRenderer = new OrthogonalTiledMapRenderer(currentMap);
         }
@@ -91,38 +94,74 @@ public class MapManager {
         setupEntitiesForMap(currentMap);
     }
 
-    private void setupEntitiesForMap(TiledMap map) {
+      private void setupEntitiesForMap(TiledMap map) {
+
         entityManager.clearEntities();
 
+
+
         MapLayer itemLayer = map.getLayers().get("Items");
+
         if (itemLayer == null) return;
 
+
+
         for (MapObject obj : itemLayer.getObjects()) {
+
             if (obj instanceof RectangleMapObject) {
+
                 Rectangle rect = ((RectangleMapObject) obj).getRectangle();
 
+
+
                 String itemID = obj.getProperties().get("ID", String.class);
+
                 if (collectedItems.contains(itemID)) {
+
                     continue;
+
                 }
 
+
+
                 String name = obj.getName();
+
                 String texKey = obj.getProperties().get("texture", String.class);
+
                 String dialogue = obj.getProperties().get("dialogue", String.class);
+
+
 
                 Texture tex = itemLibrary.get(texKey);
 
 
+
+
+
                 // debug
+
                 if (tex != null) {
-                    // Tạo item mới và thêm vào manager
-                    // Lưu ý: Tọa độ x, y lấy trực tiếp từ hình chữ nhật bạn vẽ trong Tiled
-                    entityManager.addItem(new Item(tex, rect.x, rect.y, name, itemID));
+
+                    // 1. Tạo đối tượng Item mới
+                    Item newItem = new Item(tex, rect.x, rect.y, name, itemID);
+
+                    // 2. DÒNG QUAN TRỌNG NHẤT: Copy toàn bộ thuộc tính (Properties) từ Tiled vào Item
+                    // Điều này giúp Item biết nó là 'ITEM' hay 'CONTAINER'
+                    newItem.getProperties().putAll(obj.getProperties());
+
+                    // 3. Thêm vào manager như bình thường
+                    entityManager.addItem(newItem);
+
                 } else {
+
                     Gdx.app.log("MapManager", "Lỗi: Không tìm thấy texture cho key: " + texKey);
+
                 }
+
             }
+
         }
+
     }
 
     public  void checkPortals(Player player, MapTransitionListener listener) {
@@ -139,9 +178,9 @@ public class MapManager {
                 Rectangle rect = ((RectangleMapObject) object). getRectangle();
                 if (player.getBounds().overlaps(rect)) {
                     // Ở bếp: chỉ cho qua portal khi cửa đã mở.
-                    if ("kitchen.tmx".equals(currentMapPath) && !kitchenDoorOpen) {
-                        continue;
-                    }
+                    //if ("kitchen.tmx".equals(currentMapPath) && !kitchenDoorOpen) {
+                       // continue;
+                    //}
                     String target = object.getProperties().get("targetMap", String.class);
                     float tx = object.getProperties().get("targetSpawnX", Number.class).floatValue();
                     float ty = object.getProperties().get("targetSpawnY", Number.class).floatValue();
@@ -154,8 +193,8 @@ public class MapManager {
         }
     }
 
-    public void update(float delta) {
-        if (!kitchenDoorAnimating) return;
+     public void update(float delta) {
+        /*if (!kitchenDoorAnimating) return;
 
         doorAnimTimer += delta;
         if (doorAnimTimer < DOOR_FRAME_DURATION) return;
@@ -169,10 +208,11 @@ public class MapManager {
             syncKitchenDoorCollision();
         }
         applyKitchenDoorFrame(doorAnimFrame);
+     */
     }
 
     public boolean tryToggleKitchenDoor(Player player) {
-        if (!"kitchen.tmx".equals(currentMapPath)) return false;
+       /* if (!"kitchen.tmx".equals(currentMapPath)) return false;
         if (kitchenDoorAnimating) return false;
         if (!isPlayerNearKitchenDoor(player)) return false;
 
@@ -181,15 +221,18 @@ public class MapManager {
         doorAnimTimer = 0f;
         doorAnimFrame = kitchenDoorOpen ? (DOOR_OPEN_FRAMES.length - 1) : 0;
         applyKitchenDoorFrame(doorAnimFrame);
-        return true;
+        return true;*/
+        return false;
     }
 
     public boolean shouldShowKitchenDoorHint(Player player) {
-        if (!"kitchen.tmx".equals(currentMapPath)) return false;
+        /*if (!"kitchen.tmx".equals(currentMapPath)) return false;
         if (kitchenDoorOpen) return false;
         if (kitchenDoorAnimating) return false;
         if (kitchenDoorCollisionRect == null) return false;
         return player.getBounds().overlaps(kitchenDoorCollisionRect);
+    */
+    return false;
     }
 
     public boolean isKitchenDoorOpen() {
@@ -335,5 +378,7 @@ public class MapManager {
         mapRenderer.dispose();
     }
 
-
+public Map<String, Texture> getItemLibrary() {
+    return itemLibrary;
+}
 }
