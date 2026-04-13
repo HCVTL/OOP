@@ -116,8 +116,8 @@
    <properties>
     <property name="islocked" type="bool" value="true"/>
     <property name="requireKey" value=""/>
-    <property name="spawnX" type="float" value="350"/>
-    <property name="spawnY" type="float" value="40"/>
+    <property name="spawnX" type="float" value="380"/>
+    <property name="spawnY" type="float" value="272.58"/>
     <property name="targetMap" value="map.tmx"/>
    </properties>
   </object>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="4">
  <tileset firstgid="1" source="map_Kitchen/floor.tsx"/>
  <tileset firstgid="225" name="beds_BR" tilewidth="16" tileheight="16" tilecount="224" columns="14">
   <image source="map_Kitchen/pixelinterior_BR_v1.1/beds_BR.png" width="231" height="256"/>
@@ -11,6 +11,9 @@
   <image source="map_Kitchen/pixelinterior_BR_v1.1/decorations_BR.png" width="192" height="192"/>
  </tileset>
  <tileset firstgid="1076" source="map_Kitchen/funiture2.tsx"/>
+ <tileset firstgid="2090" name="chest_01" tilewidth="16" tileheight="16" tilecount="4" columns="4">
+  <image source="sprites/objects/chest_01.png" width="64" height="16"/>
+ </tileset>
  <layer id="1" name="Floor" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -31,6 +34,16 @@
 108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111
 </data>
  </layer>
+ <objectgroup id="5" name="Door">
+  <object id="2" x="0" y="140" width="4.5" height="39">
+   <properties>
+    <property name="spawnX" type="float" value="0"/>
+    <property name="spawnY" type="float" value="0"/>
+    <property name="targetMap" value="map.tmx"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="6" name="Items"/>
  <layer id="3" name="Wall" width="16" height="16">
   <data encoding="csv">
 25,26,25,26,25,26,25,26,25,26,25,26,25,26,25,26,
@@ -58,7 +71,7 @@
 0,964,965,966,0,0,0,0,0,0,0,0,0,492,493,494,
 0,0,0,0,0,0,0,0,852,853,0,0,0,513,514,515,
 0,0,0,0,0,0,0,0,873,874,243,244,245,534,535,536,
-0,0,0,0,0,0,0,0,894,895,257,258,259,555,556,557,
+0,0,0,0,0,2090,0,0,894,895,257,258,259,555,556,557,
 0,0,0,0,0,0,0,0,0,0,271,272,273,0,0,0,
 0,0,0,0,0,0,0,0,0,0,285,286,287,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
