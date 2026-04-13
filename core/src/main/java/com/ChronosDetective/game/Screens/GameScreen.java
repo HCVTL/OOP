@@ -270,12 +270,14 @@ public class GameScreen implements Screen {
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.RED);
 
-        // Vẽ thử cái khung của Portal
-        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
-        for (MapObject obj : layer.getObjects()) {
-            if (obj instanceof RectangleMapObject) {
-                Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                debugRenderer.rect(r.x, r.y, r.width, r.height);
+        // Debug: khung vùng chuyển map (Portals hoặc Door tùy map)
+        MapLayer portalLayer = mapManager.getPortalTransitionLayer();
+        if (portalLayer != null) {
+            for (MapObject obj : portalLayer.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                    debugRenderer.rect(r.x, r.y, r.width, r.height);
+                }
             }
         }
 

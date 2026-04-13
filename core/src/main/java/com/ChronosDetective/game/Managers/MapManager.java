@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -164,32 +165,51 @@ public class MapManager {
 
     }
 
-    public  void checkPortals(Player player, MapTransitionListener listener) {
-        // Lấy vùng để xử lý logic chuyển map
+    /**
+     * Lớp object chứa vùng chuyển map: ưu tiên "Portals" (kitchen.tmx), không có thì "Door" (map.tmx, bedroom, v.v.).
+     */
+    public MapLayer getPortalTransitionLayer() {
+        if (currentMap == null) return null;
         MapLayer layer = currentMap.getLayers().get("Portals");
-
         if (layer == null) {
-            System.out.println("Lỗi: Không tìm thấy lớp nào tên Portals");
-            return;
+            layer = currentMap.getLayers().get("Door");
         }
+        return layer;
+    }
+
+    private static float readPortalSpawnX(MapObject object) {
+        MapProperties p = object.getProperties();
+        Number n = p.get("targetSpawnX", Number.class);
+        if (n != null) return n.floatValue();
+        n = p.get("spawnX", Number.class);
+        return n != null ? n.floatValue() : 0f;
+    }
+
+    private static float readPortalSpawnY(MapObject object) {
+        MapProperties p = object.getProperties();
+        Number n = p.get("targetSpawnY", Number.class);
+        if (n != null) return n.floatValue();
+        n = p.get("spawnY", Number.class);
+        return n != null ? n.floatValue() : 0f;
+    }
+
+    public void checkPortals(Player player, MapTransitionListener listener) {
+        MapLayer layer = getPortalTransitionLayer();
+        if (layer == null) return;
 
         for (MapObject object : layer.getObjects()) {
-            if (object instanceof RectangleMapObject) {
-                Rectangle rect = ((RectangleMapObject) object). getRectangle();
-                if (player.getBounds().overlaps(rect)) {
-                    // Ở bếp: chỉ cho qua portal khi cửa đã mở.
-                    //if ("kitchen.tmx".equals(currentMapPath) && !kitchenDoorOpen) {
-                       // continue;
-                    //}
-                    String target = object.getProperties().get("targetMap", String.class);
-                    float tx = object.getProperties().get("targetSpawnX", Number.class).floatValue();
-                    float ty = object.getProperties().get("targetSpawnY", Number.class).floatValue();
+            if (!(object instanceof RectangleMapObject)) continue;
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            if (rect.width <= 0f || rect.height <= 0f) continue;
+            if (!player.getBounds().overlaps(rect)) continue;
 
-                    System.out.println("Va chạm cửa! Chuyển đến: " + target); // Thêm dòng này để kiểm tra console
-                    listener.onTransition(target, tx, ty);
-                    break;
-                }
-            }
+            String target = object.getProperties().get("targetMap", String.class);
+            if (target == null || target.isEmpty()) continue;
+
+            float tx = readPortalSpawnX(object);
+            float ty = readPortalSpawnY(object);
+            listener.onTransition(target, tx, ty);
+            break;
         }
     }
 
