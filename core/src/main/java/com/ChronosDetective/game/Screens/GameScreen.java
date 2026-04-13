@@ -142,8 +142,8 @@ public class GameScreen implements Screen {
         //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
 
         // 6. CHUẨN BỊ THÔNG SỐ MẶC ĐỊNH (Dành cho New Game)
-        String mapPathToLoad = "map.tmx";
-        String mapNameToLoad = "map.tmx";
+        String mapPathToLoad = "living_room.tmx";
+        String mapNameToLoad = "living_room.tmx";
         float startX = 100;
         float startY = 100;
 
@@ -304,11 +304,13 @@ public class GameScreen implements Screen {
         debugRenderer.setColor(Color.RED);
 
         // Vẽ thử cái khung của Portal
-        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
-        for (MapObject obj : layer.getObjects()) {
-            if (obj instanceof RectangleMapObject) {
-                Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                debugRenderer.rect(r.x, r.y, r.width, r.height);
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
+        if (layer != null) {
+            for (MapObject obj : layer.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                    debugRenderer.rect(r.x, r.y, r.width, r.height);
+                }
             }
         }
 

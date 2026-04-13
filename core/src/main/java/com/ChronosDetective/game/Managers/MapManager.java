@@ -128,10 +128,10 @@ public class MapManager {
 
     public  void checkPortals(Player player, MapTransitionListener listener) {
         // Lấy vùng để xử lý logic chuyển map
-        MapLayer layer = currentMap.getLayers().get("Portals");
+        MapLayer layer = currentMap.getLayers().get("Doors");
 
         if (layer == null) {
-            System.out.println("Lỗi: Không tìm thấy lớp nào tên Portals");
+            System.out.println("Lỗi: Không tìm thấy lớp nào tên Door");
             return;
         }
 
@@ -144,8 +144,8 @@ public class MapManager {
                         continue;
                     }
                     String target = object.getProperties().get("targetMap", String.class);
-                    float tx = object.getProperties().get("targetSpawnX", Number.class).floatValue();
-                    float ty = object.getProperties().get("targetSpawnY", Number.class).floatValue();
+                    float tx = object.getProperties().get("spawnX", Number.class).floatValue();
+                    float ty = object.getProperties().get("spawnY", Number.class).floatValue();
 
                     System.out.println("Va chạm cửa! Chuyển đến: " + target); // Thêm dòng này để kiểm tra console
                     listener.onTransition(target, tx, ty);
