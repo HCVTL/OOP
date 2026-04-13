@@ -19,7 +19,11 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
@@ -32,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
+import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
 import com.ChronosDetective.game.Managers.DialogueManager;
 import com.ChronosDetective.game.Managers.EntityManager;
@@ -89,7 +94,6 @@ public class GameScreen implements Screen {
     public GameScreen(ChronosDetectiveGame game) {
         this(game, new SaveRepository().createNewSessionId(), false);
     }
-
     public GameScreen(ChronosDetectiveGame game, String sessionId, boolean loadOnStart) {
         this.game = game;
         this.sessionId = sessionId;
@@ -249,13 +253,8 @@ public class GameScreen implements Screen {
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
-        mapManager.update(delta);
-
         // 2. Cập nhật logic (Quan trọng!)
         if (!isAnyOverlayOpen) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                mapManager.tryToggleKitchenDoor(player);
-            }
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
@@ -286,11 +285,6 @@ public class GameScreen implements Screen {
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
-            if (mapManager.shouldShowKitchenDoorHint(player)) {
-                gameUiFont.setColor(Color.YELLOW);
-                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
-                gameUiFont.setColor(Color.WHITE);
-            }
         batch.end();
 
 
@@ -300,7 +294,7 @@ public class GameScreen implements Screen {
         debugRenderer.setColor(Color.RED);
 
         // Vẽ thử cái khung của Portal
-        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Portals");
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
         for (MapObject obj : layer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
