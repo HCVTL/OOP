@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="4">
- <tileset firstgid="1" source="map_Kitchen/floor.tsx"/>
+ <tileset firstgid="1" source="map_Kitchen/floorswalls.tsx"/>
  <tileset firstgid="225" name="beds_BR" tilewidth="16" tileheight="16" tilecount="224" columns="14">
   <image source="map_Kitchen/pixelinterior_BR_v1.1/beds_BR.png" width="231" height="256"/>
  </tileset>
@@ -10,7 +10,7 @@
  <tileset firstgid="932" name="decorations_BR" tilewidth="16" tileheight="16" tilecount="144" columns="12">
   <image source="map_Kitchen/pixelinterior_BR_v1.1/decorations_BR.png" width="192" height="192"/>
  </tileset>
- <tileset firstgid="1076" source="map_Kitchen/funiture2.tsx"/>
+ <tileset firstgid="1076" source="map_Kitchen/tables.tsx"/>
  <tileset firstgid="2090" name="chest_01" tilewidth="16" tileheight="16" tilecount="4" columns="4">
   <image source="sprites/objects/chest_01.png" width="64" height="16"/>
  </tileset>

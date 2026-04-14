@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="4">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="7">
+ <properties>
+  <property name="targetSpawnX" type="float" value="0"/>
+ </properties>
  <tileset firstgid="1" name="Dirt" tilewidth="16" tileheight="16" tilecount="64" columns="8">
   <image source="Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/assets/Tilesets/Tilled Dirt.png" width="128" height="128"/>
  </tileset>
@@ -34,6 +37,16 @@
 107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,1,1,107,107,107,107,107,107,107,107,107,107
 </data>
  </layer>
+ <objectgroup id="5" name="Items">
+  <object id="4" name="Quả táo dai" x="255.956" y="47.6454" width="14.4044" height="16.0665">
+   <properties>
+    <property name="ID" value="apple_map"/>
+    <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
+    <property name="texture" value="apple"/>
+    <property name="type" value="ITEM"/>
+   </properties>
+  </object>
+ </objectgroup>
  <layer id="3" name="Door" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -62,8 +75,8 @@
   <object id="1" name="map" x="401.108" y="272.576" width="29.9169" height="47.6454">
    <properties>
     <property name="targetMap" value="kitchen.tmx"/>
-    <property name="targetSpawnX" type="float" value="100"/>
-    <property name="targetSpawnY" type="float" value="100"/>
+    <property name="targetSpawnX" type="float" value="0.5"/>
+    <property name="targetSpawnY" type="float" value="270"/>
    </properties>
   </object>
  </objectgroup>

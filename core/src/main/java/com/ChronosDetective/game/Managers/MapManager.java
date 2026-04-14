@@ -34,6 +34,9 @@ public class MapManager {
 
         itemLibrary.put("apple", new Texture("apple.png"));
         itemLibrary.put("cafe", new Texture("cafe.png"));
+        itemLibrary.put("takecafe", new Texture("cafe.png"));
+        itemLibrary.put("key_item", new Texture("key.png"));
+        itemLibrary.put("none", new Texture("invisible.png"));
     }
 
     public MapManager (EntityManager entityManager) {
@@ -85,9 +88,17 @@ public class MapManager {
 
                 // debug
                 if (tex != null) {
-                    // Tạo item mới và thêm vào manager
-                    // Lưu ý: Tọa độ x, y lấy trực tiếp từ hình chữ nhật bạn vẽ trong Tiled
-                    entityManager.addItem(new Item(tex, rect.x, rect.y, name, itemID));
+
+                    // 1. Tạo đối tượng Item mới
+                    Item newItem = new Item(tex, rect.x, rect.y, name, itemID);
+
+                    // 2. DÒNG QUAN TRỌNG NHẤT: Copy toàn bộ thuộc tính (Properties) từ Tiled vào Item
+                    // Điều này giúp Item biết nó là 'ITEM' hay 'CONTAINER'
+                    newItem.getProperties().putAll(obj.getProperties());
+
+                    // 3. Thêm vào manager như bình thường
+                    entityManager.addItem(newItem);
+
                 } else {
                     Gdx.app.log("MapManager", "Lỗi: Không tìm thấy texture cho key: " + texKey);
                 }
@@ -144,5 +155,7 @@ public class MapManager {
         mapRenderer.dispose();
     }
 
-
+public Map<String, Texture> getItemLibrary() {
+    return itemLibrary;
+}
 }
