@@ -71,7 +71,6 @@ fonts/arialbd.ttf
 fonts/arialbi.ttf
 fonts/ariali.ttf
 fonts/ariblk.ttf
-kitchen.tmx
 libgdx.png
 libs/gdx-freetype-1.12.1.jar
 libs/gdx-freetype-platform-1.12.1-natives-desktop.jar
