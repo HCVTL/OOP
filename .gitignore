@@ -12,15 +12,15 @@
 # Gradle rác (Thủ phạm gây bảng thông báo lúc nãy)
 .gradle/
 build/
+core/build/
+lwgl3/build/
+*.bin
+*.lock
 
 # IntelliJ IDEA (File cấu hình cá nhân của máy bạn)
 .idea/
 *.iml
 out/
 gen/
-
-# Thư mục chứa file save (Đã có trong list của bạn)
-/saves/
-
 # File log của hệ thống
 *.log
