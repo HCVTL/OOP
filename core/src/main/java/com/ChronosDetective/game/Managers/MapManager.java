@@ -34,8 +34,7 @@ public class MapManager {
 
         itemLibrary.put("apple", new Texture("apple.png"));
         itemLibrary.put("cafe", new Texture("cafe.png"));
-        itemLibrary.put("takecafe", new Texture("cafe.png"));
-        itemLibrary.put("key_item", new Texture("key.png"));
+        itemLibrary.put("Chìa khóa", new Texture("key.png"));
         itemLibrary.put("none", new Texture("invisible.png"));
     }
 
