@@ -23,6 +23,7 @@ public class MapManager {
     private TiledMap currentMap;
     private OrthogonalTiledMapRenderer mapRenderer;
     private EntityManager entityManager;
+    private String currentMapName = "";
 
     private Set<String> collectedItems = new HashSet<>();
     private Map<String, Texture> itemLibrary = new HashMap<>();
@@ -157,4 +158,7 @@ public class MapManager {
 public Map<String, Texture> getItemLibrary() {
     return itemLibrary;
 }
+    public String getCurrentMapName(){
+        return currentMapName;
+    }
 }
