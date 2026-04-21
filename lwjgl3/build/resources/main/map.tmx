@@ -121,7 +121,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="Items">
-  <object id="4" name="Quả táo dai" x="81.456" y="48.6454" width="14.4044" height="16.0665">
+  <object id="4" name="Quả táo dai" x="80.5469" y="46.8272" width="14.4044" height="16.0665">
    <properties>
     <property name="ID" value="apple_map"/>
     <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
@@ -129,7 +129,7 @@
     <property name="type" value="ITEM"/>
    </properties>
   </object>
-  <object id="7" name="Quả táo dai" x="81.456" y="48.6454" width="14.4044" height="16.0665">
+  <object id="7" name="Quả táo dai" x="342.698" y="119.039" width="14.4044" height="16.0665">
    <properties>
     <property name="ID" value="apple_map"/>
     <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>

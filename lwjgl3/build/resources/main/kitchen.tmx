@@ -98,12 +98,5 @@
     <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>
-  <object id="7" name="Kitchen" x="1.08033" y="15.8449" width="33.1302" height="52.2161">
-   <properties>
-    <property name="spawnX" type="float" value="16"/>
-    <property name="spawnY" type="float" value="50"/>
-    <property name="targetMap" value="living_room.tmx"/>
-   </properties>
-  </object>
  </objectgroup>
 </map>

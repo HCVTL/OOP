@@ -286,7 +286,7 @@ public class MapManager {
     private void detectKitchenDoorBounds() {
         if (currentMap == null || !"kitchen.tmx".equals(currentMapPath)) return;
 
-        TiledMapTileLayer doorLayer = (TiledMapTileLayer) currentMap.getLayers().get("door");
+        TiledMapTileLayer doorLayer = (TiledMapTileLayer) currentMap.getLayers().get("Door_image");
         if (doorLayer == null) return;
 
         int minX = Integer.MAX_VALUE;
