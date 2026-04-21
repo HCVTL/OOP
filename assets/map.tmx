@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
  <tileset firstgid="1" name="Dirt" tilewidth="16" tileheight="16" tilecount="64" columns="8">
   <image source="Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/assets/Tilesets/Tilled Dirt.png" width="128" height="128"/>
  </tileset>
@@ -71,9 +71,9 @@
  <objectgroup id="4" name="Door">
   <object id="1" name="map" x="401.108" y="272.576" width="29.9169" height="47.6454">
    <properties>
-    <property name="spawnX" type="float" value="10.35"/>
-    <property name="spawnY" type="float" value="40.35"/>
-    <property name="targetMap" value="new_kitchen.tmx"/>
+    <property name="spawnX" type="float" value="100"/>
+    <property name="spawnY" type="float" value="100"/>
+    <property name="targetMap" value="readingBook.tmx"/>
    </properties>
   </object>
   <object id="7" x="475.346" y="171.745" width="4.43213" height="40.9972">
