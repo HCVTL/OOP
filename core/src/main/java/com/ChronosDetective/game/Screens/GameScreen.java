@@ -130,27 +130,49 @@ public class GameScreen implements Screen {
         entityManager = new EntityManager(pointerSprite);
         inventoryManager= new InventoryManager();
         mapManager = new MapManager(entityManager);
-
-
-        // 5. Khởi tạo Player
-        Texture playerTexture = new Texture("player_animation.png");
-        player = new Player(playerTexture, 100, 100, null); // Cho player đứng ở (100,100)
-
-        mapManager.loadMap("living_room.tmx", player, 100, 100);
-
-        camera.zoom = 0.8f;
-        camera.update();
-
         inventoryUI = new InventoryUI();
-        //Texture butlerTex = new Texture("butler.png");
-        //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
+        // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
+        Texture playerTexture = new Texture("player_animation.png");
+        // Đảm bảo bạn CÓ dòng này và nó không bị comment //
+        player = new Player(playerTexture, 100, 100, null);
 
+
+        // --- CHUẨN BỊ THÔNG SỐ (Nếu là New Game) ---
+        String mapPathToLoad = "living_room.tmx";
+        float startX = 100f;
+        float startY = 100f;
+
+        // --- ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU ---
         if (loadOnStart) {
             SaveData data = saves.loadGame(sessionId);
             if (data != null) {
-                player.setPosition(data.playerX, data.playerY);
+                // 1. Lấy lại tọa độ và Map
+                startX = data.playerX;
+                startY = data.playerY;
+                if (data.currentMapName != null) {
+                    mapPathToLoad = data.currentMapName;
+                }
+
+                // 2. Trả lại Sổ đen cho MapManager
+                if (data.collectedItemIds != null) {
+                    mapManager.setCollectedItems(data.collectedItemIds);
+                }
+
+                // 3. Phục hồi Túi Đồ
+                if (data.inventoryItemIds != null) {
+                    for (String itemId : data.inventoryItemIds) {
+                        Item restoredItem = mapManager.createItemFromId(itemId);
+                        if (restoredItem != null) {
+                            restoredItem.collect(); // Phải gọi để nó ko vẽ ra màn hình
+                            inventoryManager.addItem(restoredItem);
+                        }
+                    }
+                }
             }
         }
+
+        // --- BÂY GIỜ MỚI LOAD MAP ---
+        mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
     }
 
     private Drawable createSolidBackground(Color color) {
@@ -225,7 +247,7 @@ public class GameScreen implements Screen {
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
-                mapManager.loadMap(targetMap, player, x, y);
+                mapManager.loadMap(targetMap,targetMap, player, x, y);
             });
         }
         entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
@@ -388,6 +410,13 @@ public class GameScreen implements Screen {
                     data.sessionId = targetSession;
                     data.playerX = player.getX();
                     data.playerY = player.getY();
+                    data.currentMapName = mapManager.getCurrentMapName();
+                    data.collectedItemIds.clear();
+                    data.collectedItemIds.addAll(mapManager.getCollectedItems());
+                    data.inventoryItemIds.clear();
+                    for (Item item : inventoryManager.getItems()) {
+                        data.inventoryItemIds.add(item.getID());
+                    }
                     data.savedAtEpochMs = System.currentTimeMillis();
                     saves.saveGame(data);
                 }

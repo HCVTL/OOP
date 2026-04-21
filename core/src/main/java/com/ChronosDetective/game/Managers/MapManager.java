@@ -14,10 +14,7 @@ import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MapManager {
     private TiledMap currentMap;
@@ -25,7 +22,7 @@ public class MapManager {
     private EntityManager entityManager;
     private String currentMapName = "";
 
-    private Set<String> collectedItems = new HashSet<>();
+    private ArrayList<String> collectedItems = new ArrayList<>();
     private Map<String, Texture> itemLibrary = new HashMap<>();
     private String currentMapPath;
 
@@ -42,13 +39,15 @@ public class MapManager {
     public MapManager (EntityManager entityManager) {
         this.entityManager = entityManager;
         loadItemLibrary();
+        this.collectedItems = new ArrayList<>();
     }
 
-    public void loadMap(String mapPath, Player player, float spawnX, float spawnY) {
+    public void loadMap(String mapPath,String mapName, Player player, float spawnX, float spawnY) {
         if (currentMap != null) currentMap.dispose();
 
         currentMap = new TmxMapLoader().load(mapPath);
         currentMapPath = mapPath;
+        currentMapName = mapName;
         if (mapRenderer == null) {
             mapRenderer = new OrthogonalTiledMapRenderer(currentMap);
         }
@@ -75,7 +74,7 @@ public class MapManager {
                 Rectangle rect = ((RectangleMapObject) obj).getRectangle();
 
                 String itemID = obj.getProperties().get("ID", String.class);
-                if (collectedItems.contains(itemID)) {
+                if (itemID !=null   && collectedItems.contains(itemID)) {
                     continue;
                 }
 
@@ -131,12 +130,6 @@ public class MapManager {
             }
         }
     }
-
-
-    public Set<String> getCollectedItems() {
-        return collectedItems;
-    }
-
     //Giao diện để callback về GameScreen
     public interface MapTransitionListener {
         void onTransition(String targetMap, float x, float y);
@@ -161,4 +154,39 @@ public Map<String, Texture> getItemLibrary() {
     public String getCurrentMapName(){
         return currentMapName;
     }
-}
+    // 1. Lấy danh sách sổ đen ra
+    public ArrayList<String> getCollectedItems() {
+        return collectedItems;
+    }
+
+    // 2. Ghi đè sổ đen (Dùng khi Load Game)
+    public void setCollectedItems(ArrayList<String> items) {
+        this.collectedItems.clear();
+        if (items != null) {
+            this.collectedItems.addAll(items);
+        }
+    }
+        // 4. Hàm ma thuật: Nặn ra Item từ ID (Dùng để bỏ lại vào túi khi Load Game)
+        public Item createItemFromId(String id) {
+            com.badlogic.gdx.graphics.Texture tex = null;
+            String itemName = "Vật phẩm";
+
+            if ("apple_map".equals(id)) {
+                tex = itemLibrary.get("apple");
+                itemName = "Quả táo dai";
+            }
+            else if ("KEY_01".equals(id )) {
+                tex = itemLibrary.get("key_item");
+                itemName = "Chìa khóa";
+            }
+            // Sau này có đồ mới thì cứ thêm 'else if' ở đây
+
+            if (tex != null) {
+                Item newItem = new Item(tex, 0, 0, itemName, id);
+                newItem.getProperties().put("type", "ITEM"); // Đóng dấu nó là ITEM
+                return newItem;
+            }
+            return null;
+        }
+    }
+
