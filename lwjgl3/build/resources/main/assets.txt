@@ -1,3 +1,15 @@
+BedRoomKhanhDuy/FreePixel.tsx
+BedRoomKhanhDuy/TopDownHouse_DoorsAndWindows.tsx
+BedRoomKhanhDuy/TopDownHouse_FloorsAndWalls.tsx
+BedRoomKhanhDuy/beds_BR.tsx
+BedRoomKhanhDuy/cabinets_LRK.tsx
+BedRoomKhanhDuy/decorations_BR.tsx
+BedRoomKhanhDuy/decorations_LRK.tsx
+BedRoomKhanhDuy/doorswindowsstairs_LRK.tsx
+BedRoomKhanhDuy/interior free.tsx
+BedRoomKhanhDuy/livingroom_LRK.tsx
+BedRoomKhanhDuy/walls.tsx
+BedRoomKhanhDuy/wardrobes_BR.tsx
 Player_animation.png
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/ATTRIBUTION.md
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/LICENSE.txt
@@ -59,6 +71,7 @@ Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/sprout_lands_tilemap.gd
 apple.png
 arrow.png
 bedroom1.tmx
+bedroomKD.tmx
 cafe.png
 door.tsx
 fonts/ARIALN.TTF

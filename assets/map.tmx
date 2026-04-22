@@ -78,9 +78,9 @@
   </object>
   <object id="7" x="475.346" y="171.745" width="4.43213" height="40.9972">
    <properties>
-    <property name="spawnX" type="float" value="0"/>
-    <property name="spawnY" type="float" value="0"/>
-    <property name="targetMap" value="bedroom1.tmx"/>
+    <property name="spawnX" type="float" value="100.0"/>
+    <property name="spawnY" type="float" value="100.0"/>
+    <property name="targetMap" value="bedroomKD.tmx"/>
    </properties>
   </object>
  </objectgroup>
