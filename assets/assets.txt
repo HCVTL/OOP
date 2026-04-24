@@ -1,3 +1,7 @@
+Garden_map/Houses_Pack/houses.png
+Garden_map/Houses_Pack/houses.psd
+Garden_map/Houses_Pack/public-license.txt
+Garden_map/garden_map.tmx
 Player_animation.png
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/ATTRIBUTION.md
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/LICENSE.txt
@@ -74,6 +78,7 @@ fonts/arialbd.ttf
 fonts/arialbi.ttf
 fonts/ariali.ttf
 fonts/ariblk.ttf
+garden_map.tmx
 invisible.png
 key.png
 kitchen.tmx

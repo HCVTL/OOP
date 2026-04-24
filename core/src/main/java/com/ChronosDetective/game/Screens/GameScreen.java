@@ -136,7 +136,7 @@ public class GameScreen implements Screen {
         Texture playerTexture = new Texture("player_animation.png");
         player = new Player(playerTexture, 100, 100, null); // Cho player đứng ở (100,100)
 
-        mapManager.loadMap("map.tmx", player, 100, 100);
+        mapManager.loadMap("garden_map.tmx", player, 100, 100);
 
         camera.zoom = 0.8f;
         camera.update();
