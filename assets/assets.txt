@@ -62,6 +62,7 @@ Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/plugin.cfg
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/sprout_lands_tilemap.gd
 apple.png
 arrow.png
+balcony.tmx
 bedroom1.tmx
 cafe.png
 decorations_LRK.tsx
