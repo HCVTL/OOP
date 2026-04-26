@@ -175,9 +175,9 @@ public Map<String, Texture> getItemLibrary() {
                 tex = itemLibrary.get("apple");
                 itemName = "Quả táo dai";
             }
-            else if ("KEY_01".equals(id )) {
-                tex = itemLibrary.get("key_item");
-                itemName = "Chìa khóa";
+            else if ("cafe_kitchen".equals(id )) {
+                tex = itemLibrary.get("cafe");
+                itemName = "cốc cafe";
             }
             // Sau này có đồ mới thì cứ thêm 'else if' ở đây
 

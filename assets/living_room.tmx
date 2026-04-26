@@ -123,8 +123,8 @@
   </object>
   <object id="8" x="144.125" y="304.063" width="32.1875" height="15.9375">
    <properties>
-    <property name="spawnX" type="float" value="100"/>
-    <property name="spawnY" type="float" value="100"/>
+    <property name="spawnX" type="float" value="10"/>
+    <property name="spawnY" type="float" value="10"/>
     <property name="targetMap" value="kitchen.tmx"/>
    </properties>
   </object>
@@ -132,9 +132,9 @@
   <object id="10" x="153.625" y="308.938" width="0.0625"/>
   <object id="13" x="-0.181818" y="175.818" width="16.0909" height="32.0909">
    <properties>
-    <property name="spawnX" type="float" value="0"/>
-    <property name="spawnY" type="float" value="0"/>
-    <property name="targetMap" value=""/>
+    <property name="spawnX" type="float" value="20"/>
+    <property name="spawnY" type="float" value="20"/>
+    <property name="targetMap" value="garden_map.tmx"/>
    </properties>
   </object>
  </objectgroup>
