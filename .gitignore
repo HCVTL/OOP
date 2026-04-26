@@ -1,26 +1,43 @@
-.classpath
-.project
-
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-
-
-.DS_Store
-/saves/
-# Gradle rác (Thủ phạm gây bảng thông báo lúc nãy)
-.gradle/
-build/
-core/build/
-lwgl3/build/
-*.bin
-*.lock
-
-# IntelliJ IDEA (File cấu hình cá nhân của máy bạn)
+# --- IDE Files ---
 .idea/
 *.iml
-out/
+.project
+.classpath
+.settings/
+bin/
 gen/
-# File log của hệ thống
+out/
+
+# --- Build Folders (Quan trọng nhất) ---
+.gradle/
+build/
+**/build/
+core/build/
+lwgl3/build/
+android/build/
+ios/build/
+html/build/
+
+# --- Compiled Files ---
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Temporary/Log Files ---
 *.log
+*.bin
+*.lock
+*.tmp
+.DS_Store
+
+# --- Game Data (File Save cá nhân) ---
+saves/
+/saves/
+
+# --- NetBeans (Nếu có) ---
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+

@@ -123,7 +123,7 @@ public class MapManager {
                     float tx = object.getProperties().get("spawnX", Number.class).floatValue();
                     float ty = object.getProperties().get("spawnY", Number.class).floatValue();
 
-                    System.out.println("Va chạm cửa! Chuyển đến: " + target); // Thêm dòng này để kiểm tra console
+                    System.out.println("Va chạm cửa! Chuyển đến: " + target + " Với tọa độ " + tx + " " + ty); // Thêm dòng này để kiểm tra console
                     listener.onTransition(target, tx, ty);
                     break;
                 }

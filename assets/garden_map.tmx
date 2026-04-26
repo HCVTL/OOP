@@ -155,7 +155,7 @@
    <properties>
     <property name="spawnX" type="float" value="20"/>
     <property name="spawnY" type="float" value="20"/>
-    <property name="targetMap" value="map.tmx"/>
+    <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>
  </objectgroup>
