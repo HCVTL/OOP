@@ -9,7 +9,7 @@ public class Item extends Entity {
     private String name;
     private String ID;
     private float stateTime = 0;
-
+    
     // 2. THÊM BIẾN NÀY ĐỂ LƯU THUỘC TÍNH
     private MapProperties properties;
 
@@ -19,7 +19,7 @@ public class Item extends Entity {
         this.sprite.setSize(16, 16);
         this.sprite.setPosition(x, y);
         this.ID = ID;
-
+        
         // 3. KHỞI TẠO NÓ TRONG CONSTRUCTOR
         this.properties = new MapProperties();
     }
@@ -58,11 +58,11 @@ public class Item extends Entity {
         return name;
     }
 
-    public Texture getTexture() {
+    public Texture getTexture() { 
         return sprite.getTexture();
     }
 
-    public String getID() {
+    public String getID() { 
         return ID;
     }
 }

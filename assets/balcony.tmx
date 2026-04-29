@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="3">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="3">
  <tileset firstgid="1" source="map_Kitchen/floorswalls.tsx"/>
  <tileset firstgid="225" name="Fences" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/assets/Tilesets/Fences.png" width="64" height="64"/>
@@ -111,9 +111,9 @@
  <objectgroup id="4" name="Door">
   <object id="2" x="222.91" y="313.367" width="49.1049" height="5.81505">
    <properties>
-    <property name="spawnX" type="float" value="0"/>
-    <property name="spawnY" type="float" value="0"/>
-    <property name="targetMap" value="floor_2.map"/>
+    <property name="spawnX" type="float" value="10"/>
+    <property name="spawnY" type="float" value="10"/>
+    <property name="targetMap" value="map.tmx"/>
    </properties>
   </object>
  </objectgroup>

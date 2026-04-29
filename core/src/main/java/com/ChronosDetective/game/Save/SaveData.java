@@ -11,5 +11,6 @@ public class SaveData {
     public String currentMapName;
     public ArrayList<String> inventoryItemIds = new ArrayList<>();
     public ArrayList<String> collectedItemIds = new ArrayList<>();
+
     public SaveData() {}
 }

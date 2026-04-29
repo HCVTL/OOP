@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="2">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="30" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="2">
  <tileset firstgid="1" name="houses" tilewidth="16" tileheight="16" tilecount="4096" columns="64">
   <image source="Garden_map/Houses_Pack/houses.png" width="1024" height="1024"/>
  </tileset>
@@ -151,7 +151,7 @@
 </data>
  </layer>
  <objectgroup id="6" name="Door">
-  <object id="1" x="318.716" y="225.82" width="33.2311" height="55.2941">
+  <object id="1" x="322.716" y="231.07" width="27.4811" height="56.7941">
    <properties>
     <property name="spawnX" type="float" value="20"/>
     <property name="spawnY" type="float" value="20"/>
