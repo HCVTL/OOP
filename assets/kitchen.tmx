@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="20" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="18">
- <tileset firstgid="1" source="floorswalls_LRK.tsx"/>
- <tileset firstgid="225" source="kitchen_LRK.tsx"/>
- <tileset firstgid="875" source="livingroom_LRK.tsx"/>
- <tileset firstgid="1889" source="decorations_LRK.tsx"/>
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="18">
+ <tileset firstgid="1" source="map_Kitchen/floorswalls.tsx"/>
+ <tileset firstgid="225" source="map_Kitchen/funitures.tsx"/>
+ <tileset firstgid="875" source="map_Kitchen/tables.tsx"/>
+ <tileset firstgid="1889" source="map_Kitchen/decorations.tsx"/>
  <tileset firstgid="2009" source="door_LRK.tsx"/>
  <layer id="1" name="Wall" width="20" height="25">
   <data encoding="csv">
@@ -92,7 +92,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="4" name="door" width="20" height="25">
+ <layer id="4" name="Door_img" width="20" height="25">
   <properties>
    <property name="targetMap" value=""/>
   </properties>
@@ -124,29 +124,29 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="9" name="Portals">
+ <objectgroup id="9" name="Door">
   <object id="13" x="2.57109" y="29.8981" width="30.756" height="72.8437">
    <properties>
-    <property name="targetMap" type="file" value="map.tmx"/>
-    <property name="targetSpawnX" type="float" value="50"/>
-    <property name="targetSpawnY" type="float" value="35"/>
+    <property name="spawnX" type="float" value="50"/>
+    <property name="spawnY" type="float" value="35"/>
+    <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="8" name="Items" offsetx="-4.18958" offsety="6.80806">
   <object id="4" name="cốc cafe" x="258" y="93.3333" width="23.3333" height="25.3333">
    <properties>
-    <property name="ID" value="cafe"/>
+    <property name="ID" value="cafe_kitchen"/>
     <property name="dialogue" value="Cốc café vẫn còn ấm... Hình như ai đó vừa mới rời đi."/>
-    <property name="texture" value="takecafe"/>
+    <property name="texture" value="cafe"/>
     <property name="type" value="ITEM"/>
    </properties>
   </object>
-  <object id="17" name="ngăn tủ" x="162.87" y="87.4574" width="32.4692" height="30.8981">
+  <object id="17" name="Ngăn tủ" x="162.87" y="87.4574" width="32.4692" height="30.8981">
    <properties>
     <property name="ID" value="drawer"/>
+    <property name="containsItem" value="Chìa khóa"/>
     <property name="dialogue" value="Một chiếc ngăn tủ gỗ. Hình như có cái gì đó bên trong..."/>
-    <property name="hasKey" type="bool" value="true"/>
     <property name="texture" value="none"/>
     <property name="type" value="CONTAINER"/>
    </properties>

@@ -80,7 +80,7 @@
     <property name="type" value="ITEM"/>
    </properties>
   </object>
-  <object id="11" x="96.5374" y="64.9861" width="29.1967" height="6.5928"/>
+  <object id="11" x="96.5374" y="64.9861" width="29.1967" height="19.9261"/>
  </objectgroup>
  <layer id="6" name="Door_img" width="16" height="17">
   <data encoding="csv">

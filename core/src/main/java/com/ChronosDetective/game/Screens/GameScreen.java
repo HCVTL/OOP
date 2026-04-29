@@ -1,6 +1,5 @@
 package com.ChronosDetective.game.Screens;
 
-import com.ChronosDetective.game.Entities.Item;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -131,47 +130,40 @@ public class GameScreen implements Screen {
         entityManager = new EntityManager(pointerSprite);
         inventoryManager= new InventoryManager();
         mapManager = new MapManager(entityManager);
-
-
-        // 5. Khởi tạo Player
-        Texture playerTexture = new Texture("player_animation.png");
-        player = new Player(playerTexture, 100, 100, null); // Cho player đứng ở (100,100)
-
         inventoryUI = new InventoryUI();
-        //Texture butlerTex = new Texture("butler.png");
-        //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
+        // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
+        Texture playerTexture = new Texture("player_animation.png");
+        // Đảm bảo bạn CÓ dòng này và nó không bị comment //
+        player = new Player(playerTexture, 100, 100, null);
 
-        // 6. CHUẨN BỊ THÔNG SỐ MẶC ĐỊNH (Dành cho New Game)
-        String mapPathToLoad = "map.tmx";
-        String mapNameToLoad = "map.tmx";
-        float startX = 100;
-        float startY = 100;
 
-        // 7. ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU (TRƯỚC KHI LOAD MAP)
+        // --- CHUẨN BỊ THÔNG SỐ (Nếu là New Game) ---
+        String mapPathToLoad = "living_room.tmx";
+        float startX = 100f;
+        float startY = 100f;
+
+        // --- ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU ---
         if (loadOnStart) {
             SaveData data = saves.loadGame(sessionId);
             if (data != null) {
-                // Lấy lại tọa độ
+                // 1. Lấy lại tọa độ và Map
                 startX = data.playerX;
                 startY = data.playerY;
-
-                // Lấy lại Map
-                if (data.currentMapName != null && !data.currentMapName.isEmpty()) {
-                    mapNameToLoad = data.currentMapName;
+                if (data.currentMapName != null) {
                     mapPathToLoad = data.currentMapName;
                 }
 
-                // Truyền danh sách ID đồ ĐÃ NHẶT cho MapManager
+                // 2. Trả lại Sổ đen cho MapManager
                 if (data.collectedItemIds != null) {
                     mapManager.setCollectedItems(data.collectedItemIds);
                 }
 
-                // Phục hồi TÚI ĐỒ cho InventoryManager
+                // 3. Phục hồi Túi Đồ
                 if (data.inventoryItemIds != null) {
                     for (String itemId : data.inventoryItemIds) {
                         Item restoredItem = mapManager.createItemFromId(itemId);
                         if (restoredItem != null) {
-                            restoredItem.collect(); // Đánh dấu đã nhặt để không vẽ ra màn hình
+                            restoredItem.collect(); // Phải gọi để nó ko vẽ ra màn hình
                             inventoryManager.addItem(restoredItem);
                         }
                     }
@@ -179,11 +171,8 @@ public class GameScreen implements Screen {
             }
         }
 
-        // 8. CUỐI CÙNG MỚI LOAD MAP (Gọi hàm với 5 tham số)
-        mapManager.loadMap(mapPathToLoad, mapNameToLoad, player, startX, startY);
-
-        camera.zoom = 0.8f;
-        camera.update();
+        // --- BÂY GIỜ MỚI LOAD MAP ---
+        mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
     }
 
     private Drawable createSolidBackground(Color color) {
@@ -421,17 +410,14 @@ public class GameScreen implements Screen {
                     data.sessionId = targetSession;
                     data.playerX = player.getX();
                     data.playerY = player.getY();
-                    data.savedAtEpochMs = System.currentTimeMillis();
-                    // 1. Lưu tên Map (Bạn cần viết thêm hàm getCurrentMapName() trong MapManager)
                     data.currentMapName = mapManager.getCurrentMapName();
-
-                    // 2. Lưu ID các item đã bị nhặt trên map (khỏi hiện lại)
+                    data.collectedItemIds.clear();
                     data.collectedItemIds.addAll(mapManager.getCollectedItems());
-
-                    // 3. Lưu ID các item đang có trong túi đồ
+                    data.inventoryItemIds.clear();
                     for (Item item : inventoryManager.getItems()) {
                         data.inventoryItemIds.add(item.getID());
                     }
+                    data.savedAtEpochMs = System.currentTimeMillis();
                     saves.saveGame(data);
                 }
                 saveDialog = null;

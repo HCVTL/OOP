@@ -14,11 +14,7 @@ import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.ArrayList;
+import java.util.*;
 
 public class MapManager {
     private TiledMap currentMap;
@@ -26,7 +22,7 @@ public class MapManager {
     private EntityManager entityManager;
     private String currentMapName = "";
 
-    private Set<String> collectedItems = new HashSet<>();
+    private ArrayList<String> collectedItems = new ArrayList<>();
     private Map<String, Texture> itemLibrary = new HashMap<>();
     private String currentMapPath;
 
@@ -36,24 +32,22 @@ public class MapManager {
 
         itemLibrary.put("apple", new Texture("apple.png"));
         itemLibrary.put("cafe", new Texture("cafe.png"));
-        itemLibrary.put("key_item", new Texture("key.png"));
+        itemLibrary.put("Chìa khóa", new Texture("key.png"));
+        itemLibrary.put("none", new Texture("invisible.png"));
     }
 
     public MapManager (EntityManager entityManager) {
         this.entityManager = entityManager;
         loadItemLibrary();
+        this.collectedItems = new ArrayList<>();
     }
 
-    public void loadMap(String mapPath, Player player, float spawnX, float spawnY) {
+    public void loadMap(String mapPath,String mapName, Player player, float spawnX, float spawnY) {
         if (currentMap != null) currentMap.dispose();
-        loadMap(mapPath, mapPath, player, spawnX, spawnY);
-    }
 
-    public void loadMap(String mapPath, String targetMap, Player player, float spawnX, float spawnY) {
-        if (currentMap != null) currentMap.dispose();
-        this.currentMapName= targetMap;
         currentMap = new TmxMapLoader().load(mapPath);
         currentMapPath = mapPath;
+        currentMapName = mapName;
         if (mapRenderer == null) {
             mapRenderer = new OrthogonalTiledMapRenderer(currentMap);
         }
@@ -80,7 +74,7 @@ public class MapManager {
                 Rectangle rect = ((RectangleMapObject) obj).getRectangle();
 
                 String itemID = obj.getProperties().get("ID", String.class);
-                if (collectedItems.contains(itemID)) {
+                if (itemID !=null   && collectedItems.contains(itemID)) {
                     continue;
                 }
 
@@ -93,9 +87,17 @@ public class MapManager {
 
                 // debug
                 if (tex != null) {
-                    // Tạo item mới và thêm vào manager
-                    // Lưu ý: Tọa độ x, y lấy trực tiếp từ hình chữ nhật bạn vẽ trong Tiled
-                    entityManager.addItem(new Item(tex, rect.x, rect.y, name, itemID));
+
+                    // 1. Tạo đối tượng Item mới
+                    Item newItem = new Item(tex, rect.x, rect.y, name, itemID);
+
+                    // 2. DÒNG QUAN TRỌNG NHẤT: Copy toàn bộ thuộc tính (Properties) từ Tiled vào Item
+                    // Điều này giúp Item biết nó là 'ITEM' hay 'CONTAINER'
+                    newItem.getProperties().putAll(obj.getProperties());
+
+                    // 3. Thêm vào manager như bình thường
+                    entityManager.addItem(newItem);
+
                 } else {
                     Gdx.app.log("MapManager", "Lỗi: Không tìm thấy texture cho key: " + texKey);
                 }
@@ -128,50 +130,6 @@ public class MapManager {
             }
         }
     }
-
-
-    public Set<String> getCollectedItems() {
-        return collectedItems;
-    }
-
-    public Map<String, Texture> getItemLibrary() {
-        return itemLibrary;
-    }
-
-    public void setCollectedItems(ArrayList<String> savedItems) {
-        if (savedItems != null) {
-            this.collectedItems.clear(); // Xóa dữ liệu cũ
-            this.collectedItems.addAll(savedItems); // Thêm dữ liệu từ save
-        }
-    }
-
-    // 2. Tái tạo lại Item để nhét vào túi đồ khi Load Game
-    public Item createItemFromId(String id) {
-        Texture tex = null;
-        String itemName = "Vật phẩm";
-
-        // TODO: Bạn cần sửa các chữ "id_cua_qua_tao" thành đúng ID bạn đặt trong TiledMap
-        if (id.equals("apple_map")) {
-            tex = itemLibrary.get("apple");
-            itemName = "Quả táo";
-        }
-        // Thêm các món đồ khác của bạn ở đây...
-        /*
-        else if (id.equals("id_chia_khoa")) {
-            tex = itemLibrary.get("key");
-            itemName = "Chìa khóa";
-        }
-        */
-
-        // Nếu tìm thấy đồ, tạo Item ở tọa độ (0,0) vì nó chỉ nằm trong túi, không vẽ ra map
-        if (tex != null) {
-            return new Item(tex, 0, 0, itemName, id);
-        }
-
-        System.out.println("Lỗi Load Game: Không nhận diện được vật phẩm có ID: " + id);
-        return null;
-    }
-
     //Giao diện để callback về GameScreen
     public interface MapTransitionListener {
         void onTransition(String targetMap, float x, float y);
@@ -190,8 +148,45 @@ public class MapManager {
         mapRenderer.dispose();
     }
 
+public Map<String, Texture> getItemLibrary() {
+    return itemLibrary;
+}
     public String getCurrentMapName(){
         return currentMapName;
     }
+    // 1. Lấy danh sách sổ đen ra
+    public ArrayList<String> getCollectedItems() {
+        return collectedItems;
+    }
 
-}
+    // 2. Ghi đè sổ đen (Dùng khi Load Game)
+    public void setCollectedItems(ArrayList<String> items) {
+        this.collectedItems.clear();
+        if (items != null) {
+            this.collectedItems.addAll(items);
+        }
+    }
+        // 4. Hàm ma thuật: Nặn ra Item từ ID (Dùng để bỏ lại vào túi khi Load Game)
+        public Item createItemFromId(String id) {
+            com.badlogic.gdx.graphics.Texture tex = null;
+            String itemName = "Vật phẩm";
+
+            if ("apple_map".equals(id)) {
+                tex = itemLibrary.get("apple");
+                itemName = "Quả táo dai";
+            }
+            else if ("cafe_kitchen".equals(id )) {
+                tex = itemLibrary.get("cafe");
+                itemName = "cốc cafe";
+            }
+            // Sau này có đồ mới thì cứ thêm 'else if' ở đây
+
+            if (tex != null) {
+                Item newItem = new Item(tex, 0, 0, itemName, id);
+                newItem.getProperties().put("type", "ITEM"); // Đóng dấu nó là ITEM
+                return newItem;
+            }
+            return null;
+        }
+    }
+
