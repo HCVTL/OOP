@@ -95,9 +95,9 @@
    <properties>
     <property name="isLocked" type="bool" value="false"/>
     <property name="requireKey" type="bool" value="false"/>
-    <property name="spawnX" type="float" value="20"/>
-    <property name="spawnY" type="float" value="20"/>
-    <property name="targetMap" value="map.tmx"/>
+    <property name="spawnX" type="float" value="50"/>
+    <property name="spawnY" type="float" value="80"/>
+    <property name="targetMap" value="hall.tmx"/>
    </properties>
   </object>
  </objectgroup>

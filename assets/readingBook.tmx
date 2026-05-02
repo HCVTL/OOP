@@ -116,8 +116,8 @@
   </properties>
   <object id="1" x="221.083" y="304.917" width="37.4167" height="13.0833">
    <properties>
-    <property name="spawnX" type="float" value="20"/>
-    <property name="spawnY" type="float" value="20"/>
+    <property name="spawnX" type="float" value="157"/>
+    <property name="spawnY" type="float" value="203"/>
     <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>

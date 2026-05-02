@@ -92,44 +92,44 @@
  <objectgroup id="4" name="Door">
   <object id="1" name="map" x="433.108" y="304.076" width="33.9169" height="15.1454">
    <properties>
-    <property name="spawnX" type="float" value="50"/>
-    <property name="spawnY" type="float" value="50"/>
+    <property name="spawnX" type="float" value="256"/>
+    <property name="spawnY" type="float" value="260"/>
     <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>
   <object id="15" name="map" x="144.042" y="304.427" width="33.9169" height="15.1454">
    <properties>
-    <property name="spawnX" type="float" value="20"/>
-    <property name="spawnY" type="float" value="20"/>
+    <property name="spawnX" type="float" value="100"/>
+    <property name="spawnY" type="float" value="150"/>
     <property name="targetMap" value="bedroom3.tmx"/>
    </properties>
   </object>
   <object id="16" name="map" x="304.375" y="304.427" width="33.9169" height="15.1454">
    <properties>
-    <property name="spawnX" type="float" value="30"/>
-    <property name="spawnY" type="float" value="30"/>
+    <property name="spawnX" type="float" value="93"/>
+    <property name="spawnY" type="float" value="160"/>
     <property name="targetMap" value="bedroom4.tmx"/>
    </properties>
   </object>
   <object id="21" name="map" x="430.542" y="1.4273" width="33.9169" height="15.1454">
    <properties>
-    <property name="spawnX" type="float" value="50"/>
-    <property name="spawnY" type="float" value="50"/>
+    <property name="spawnX" type="float" value="270"/>
+    <property name="spawnY" type="float" value="20"/>
     <property name="targetMap" value="hall.tmx"/>
    </properties>
   </object>
   <object id="23" name="map" x="243.042" y="32.9273" width="27.9169" height="45.6454">
    <properties>
-    <property name="spawnX" type="float" value="20"/>
-    <property name="spawnY" type="float" value="20"/>
-    <property name="targetMap" value="bedroomKD.tmx"/>
+    <property name="spawnX" type="float" value="210"/>
+    <property name="spawnY" type="float" value="15"/>
+    <property name="targetMap" value="balcony.tmx"/>
    </properties>
   </object>
   <object id="24" name="map" x="-0.322086" y="160.041" width="16.2805" height="31.8272">
    <properties>
-    <property name="spawnX" type="float" value="130"/>
-    <property name="spawnY" type="float" value="90"/>
-    <property name="targetMap" value="BedroomMaster.tmx"/>
+    <property name="spawnX" type="float" value="150"/>
+    <property name="spawnY" type="float" value="70"/>
+    <property name="targetMap" value="bedroom2KD.tmx"/>
    </properties>
   </object>
  </objectgroup>
@@ -161,38 +161,6 @@
   <object id="4" name="Quả táo dai" x="80.5469" y="46.8272" width="14.4044" height="16.0665">
    <properties>
     <property name="ID" value="apple_map"/>
-    <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
-    <property name="texture" value="apple"/>
-    <property name="type" value="ITEM"/>
-   </properties>
-  </object>
-  <object id="7" name="Quả táo dai" x="342.698" y="119.039" width="14.4044" height="16.0665">
-   <properties>
-    <property name="ID" value="apple4_map"/>
-    <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
-    <property name="texture" value="apple"/>
-    <property name="type" value="ITEM"/>
-   </properties>
-  </object>
-  <object id="8" name="Quả táo dai" x="149.464" y="133.3" width="14.4044" height="16.0665">
-   <properties>
-    <property name="ID" value="apple3_map"/>
-    <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
-    <property name="texture" value="apple"/>
-    <property name="type" value="ITEM"/>
-   </properties>
-  </object>
-  <object id="9" name="Quả táo dai" x="93.4645" y="156.3" width="14.4044" height="16.0665">
-   <properties>
-    <property name="ID" value="apple2_map"/>
-    <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
-    <property name="texture" value="apple"/>
-    <property name="type" value="ITEM"/>
-   </properties>
-  </object>
-  <object id="10" name="Quả táo dai" x="119.464" y="214.633" width="14.4044" height="16.0665">
-   <properties>
-    <property name="ID" value="apple1_map"/>
     <property name="dialogue" value="Chào mừng mọi người đã đến với trải nghiệm bị con gái đì"/>
     <property name="texture" value="apple"/>
     <property name="type" value="ITEM"/>

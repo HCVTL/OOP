@@ -89,9 +89,9 @@
 </data>
  </layer>
  <objectgroup id="5" name="Door">
-  <object id="1" x="112.667" y="17.3333" width="31.3333" height="46">
+  <object id="1" x="112.667" y="17.3333" width="31.3333" height="51.5">
    <properties>
-    <property name="spawnX" type="float" value="10"/>
+    <property name="spawnX" type="float" value="124"/>
     <property name="spawnY" type="float" value="10"/>
     <property name="targetMap" value="map.tmx"/>
    </properties>
