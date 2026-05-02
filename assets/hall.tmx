@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="28" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="7">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="28" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
  <tileset firstgid="1" source="map_hall/wall.tsx"/>
  <tileset firstgid="225" source="map_hall/decor.tsx"/>
  <tileset firstgid="345" source="map_hall/decor2.tsx"/>
  <tileset firstgid="1359" source="map_hall/door.tsx"/>
+ <tileset firstgid="2095" source="BedRoomKhanhDuy/cabinets_LRK.tsx"/>
+ <tileset firstgid="3270" source="map_Livingroom/pixelinterior_LRK_v1.1/floorswalls_LRK.tsx"/>
+ <tileset firstgid="3494" source="map_Livingroom/pixelinterior_BR_v1.1/decorations_BR.tsx"/>
  <layer id="1" name="Wall" width="28" height="12">
   <data encoding="csv">
 24,25,26,27,24,25,26,27,24,25,26,27,24,25,26,27,24,25,26,27,24,25,26,27,24,25,26,27,
@@ -12,12 +15,12 @@
 66,67,68,69,0,0,68,69,66,67,68,69,66,67,68,69,66,67,68,69,66,67,68,69,0,0,68,69,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-988,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-1027,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-1066,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-1105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-108,109,110,111,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
  <layer id="5" name="Door_img" width="28" height="12">
@@ -44,26 +47,26 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 80,81,82,83,80,81,82,83,80,81,82,83,80,81,82,83,80,81,82,83,80,81,82,83,80,81,82,83,
 94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,
-988,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,
-1027,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,
-1066,95,96,97,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,
-1105,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,
-108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,1248,1249,108,109,110,111,108,109,110,111,
-0,0,0,0,108,109,110,111,108,109,110,111,108,109,110,111,94,109,1287,1288,108,109,110,111,108,109,110,111
+3364,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,
+3534,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,
+3546,95,96,97,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,108,109,110,111,
+3365,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,94,95,96,97,
+3364,3364,3364,3364,108,109,110,111,108,109,110,111,108,109,110,111,108,109,1248,1249,108,109,110,111,108,109,110,111,
+3364,3364,3364,3364,108,109,110,111,108,109,110,111,108,109,110,111,94,109,1287,1288,108,109,110,111,108,109,110,111
 </data>
  </layer>
  <objectgroup id="6" name="Door">
   <object id="1" x="65.5" y="17.5" width="30" height="49.5">
    <properties>
-    <property name="spawnX" type="float" value="40"/>
-    <property name="spawnY" type="float" value="20"/>
-    <property name="targetMap" value="bedroom2KD.tmx"/>
+    <property name="spawnX" type="float" value="30"/>
+    <property name="spawnY" type="float" value="50"/>
+    <property name="targetMap" value="bedroomKD.tmx"/>
    </properties>
   </object>
   <object id="2" x="287.5" y="174.5" width="31.5" height="19">
    <properties>
-    <property name="spawnX" type="float" value="50"/>
-    <property name="spawnY" type="float" value="50"/>
+    <property name="spawnX" type="float" value="413"/>
+    <property name="spawnY" type="float" value="256"/>
     <property name="targetMap" value="map.tmx"/>
    </properties>
   </object>
@@ -74,11 +77,11 @@
     <property name="targetMap" value="storage.tmx"/>
    </properties>
   </object>
-  <object id="5" x="-1.5" y="98" width="17.5" height="63">
+  <object id="7" x="0.0909091" y="111.614" width="15.0909" height="32.4091">
    <properties>
-    <property name="spawnX" type="float" value="0"/>
-    <property name="spawnY" type="float" value="100"/>
-    <property name="targetMap" value="balcony.tmx"/>
+    <property name="spawnX" type="float" value="300"/>
+    <property name="spawnY" type="float" value="130"/>
+    <property name="targetMap" value="BedroomMaster.tmx"/>
    </properties>
   </object>
  </objectgroup>

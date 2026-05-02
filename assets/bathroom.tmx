@@ -80,9 +80,9 @@
  <objectgroup id="4" name="Door">
   <object id="1" x="177.091" y="80.1818" width="47.8182" height="46.5455">
    <properties>
-    <property name="spawnX" type="float" value="20"/>
-    <property name="spawnY" type="float" value="20"/>
-    <property name="targetMap" value="bedroom4.tmx"/>
+    <property name="spawnX" type="float" value="170"/>
+    <property name="spawnY" type="float" value="60"/>
+    <property name="targetMap" value="BedroomMaster.tmx"/>
    </properties>
   </object>
  </objectgroup>

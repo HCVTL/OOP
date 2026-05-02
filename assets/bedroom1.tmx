@@ -37,8 +37,8 @@
  <objectgroup id="5" name="Door">
   <object id="2" x="0" y="140" width="4.5" height="39">
    <properties>
-    <property name="spawnX" type="float" value="10"/>
-    <property name="spawnY" type="float" value="10"/>
+    <property name="spawnX" type="float" value="250"/>
+    <property name="spawnY" type="float" value="50"/>
     <property name="targetMap" value="living_room.tmx"/>
    </properties>
   </object>

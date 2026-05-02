@@ -66,8 +66,8 @@
  <objectgroup id="4" name="Door">
   <object id="1" x="1.06305" y="232.1" width="47.4831" height="23.0328">
    <properties>
-    <property name="spawnX" type="float" value="30"/>
-    <property name="spawnY" type="float" value="30"/>
+    <property name="spawnX" type="float" value="360"/>
+    <property name="spawnY" type="float" value="90"/>
     <property name="targetMap" value="hall.tmx"/>
    </properties>
   </object>

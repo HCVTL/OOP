@@ -111,8 +111,8 @@
  <objectgroup id="4" name="Door">
   <object id="2" x="222.91" y="313.367" width="49.1049" height="5.81505">
    <properties>
-    <property name="spawnX" type="float" value="10"/>
-    <property name="spawnY" type="float" value="10"/>
+    <property name="spawnX" type="float" value="220"/>
+    <property name="spawnY" type="float" value="200"/>
     <property name="targetMap" value="map.tmx"/>
    </properties>
   </object>
