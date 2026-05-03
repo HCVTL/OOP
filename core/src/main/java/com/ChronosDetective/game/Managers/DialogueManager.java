@@ -22,6 +22,10 @@ public class DialogueManager {
     private String fullText = "";     // Nội dung đầy đủ
     private String currentText = "";  // Nội dung đang hiển thị dần dần
 
+    // Hiển thị trang thoại
+    private String[] pages;
+    private int pageIndex = 0;
+
     // ĐIỀU KHIỂN CHỮ CHẠY
     private int charIndex = 0;
     private float timeCounter = 0;
@@ -56,15 +60,45 @@ public class DialogueManager {
     }
 
     // Hàm bắt đầu hội thoại - Gọi khi tương tác với NPC/Vật phẩm
-    public void startDialogue(String name, String text) {
+    public void startDialogue(String name, String[] textPages) {
         this.isActive = true;
         this.speakerName = name;
-        this.fullText = text;
+        this.pages = textPages;
+        this.pageIndex = 0;
 
-        // Reset hiệu ứng chạy chữ
-        this.currentText = "";
-        this.charIndex = 0;
-        this.timeCounter = 0;
+        //Thiết lập trang đầu tiên
+        setupPage();
+    }
+
+    //Thiết lập trang hện tại
+    private void setupPage() {
+        if (pages != null && pageIndex < pages.length) {
+            this.fullText = pages[pageIndex];
+            this.currentText = "";
+            this.charIndex = 0;
+            this.timeCounter = 0;
+        }
+    }
+
+    // Lật trang tiếp theo
+    public void nextPage() {
+        if (charIndex < fullText.length()) {
+            charIndex = fullText.length();
+            currentText = fullText;
+        }
+        else {
+            pageIndex++;
+            if (pageIndex < pages.length) {
+                setupPage();
+            }
+            else {
+                closeDialogue();
+            }
+        }
+    }
+
+    public boolean isLastPage() {
+        return pages == null || pageIndex >= pages.length - 1;
     }
 
     public void closeDialogue() {
@@ -123,11 +157,11 @@ public class DialogueManager {
 
         // Vẽ hint khi chạy xong chữ
         if (isFinished()) {
-            font.getData().setScale(zoom * 0.75f);
+            font.getData().setScale(camera.zoom * 0.75f);
             font.setColor(Color.GRAY);
-            font.draw(batch, "[PRESS E TO CLOSE]", boxX + boxW - (160 * zoom), boxY + (25 * zoom));
+            String hint = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
+            font.draw(batch, hint, boxX + boxW - (180 * camera.zoom), boxY + (25 * camera.zoom));
         }
-
         batch.end();
     }
 

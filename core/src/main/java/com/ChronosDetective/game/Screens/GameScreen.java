@@ -1,5 +1,6 @@
 package com.ChronosDetective.game.Screens;
 
+import com.ChronosDetective.game.Managers.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -37,10 +38,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
-import com.ChronosDetective.game.Managers.DialogueManager;
-import com.ChronosDetective.game.Managers.EntityManager;
-import com.ChronosDetective.game.Managers.InventoryManager;
-import com.ChronosDetective.game.Managers.MapManager;
 import com.ChronosDetective.game.UI.InventoryUI;
 import com.ChronosDetective.game.Save.SaveData;
 import com.ChronosDetective.game.Save.SaveRepository;
@@ -68,6 +65,7 @@ public class GameScreen implements Screen {
     private DialogueManager dialogueManager;
     private InventoryManager inventoryManager;
     private MapManager mapManager;
+    private StoryManager storyManager;
 
     private Sprite pointerSprite;
 
@@ -130,6 +128,7 @@ public class GameScreen implements Screen {
         entityManager = new EntityManager(pointerSprite);
         inventoryManager= new InventoryManager();
         mapManager = new MapManager(entityManager);
+        storyManager = new StoryManager();
         inventoryUI = new InventoryUI();
         // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
         Texture playerTexture = new Texture("player_animation.png");
@@ -250,7 +249,7 @@ public class GameScreen implements Screen {
                 mapManager.loadMap(targetMap,targetMap, player, x, y);
             });
         }
-        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
+        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager, storyManager);
 
         // 3. Cập nhật Camera đuổi theo nhân vật
         float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)

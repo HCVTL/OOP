@@ -1,9 +1,11 @@
 package com.ChronosDetective.game.Managers;
 
+import com.ChronosDetective.game.Entities.NPC;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -34,6 +36,8 @@ public class MapManager {
         itemLibrary.put("cafe", new Texture("cafe.png"));
         itemLibrary.put("Chìa khóa", new Texture("key.png"));
         itemLibrary.put("none", new Texture("invisible.png"));
+
+        itemLibrary.put("fran", new Texture("Characters/Fran.png"));
     }
 
     public MapManager (EntityManager entityManager) {
@@ -72,31 +76,41 @@ public class MapManager {
         for (MapObject obj : itemLayer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                MapProperties props = obj.getProperties();
 
-                String itemID = obj.getProperties().get("ID", String.class);
-                if (itemID !=null   && collectedItems.contains(itemID)) {
-                    continue;
-                }
-
+                String ID = props.get("ID", String.class);
+                String type = props.get("type", String.class);
                 String name = obj.getName();
-                String texKey = obj.getProperties().get("texture", String.class);
-                String dialogue = obj.getProperties().get("dialogue", String.class);
+                String texKey = props.get("texture", String.class);
+                String rawDialogue = props.get("dialogue", String.class);
 
                 Texture tex = itemLibrary.get(texKey);
 
 
                 // debug
                 if (tex != null) {
+                    if ("NPC".equals(type)) {
+                        NPC newNPC = new NPC(tex, rect.x, rect.y, name, ID);
+                        newNPC.getProperties().putAll(props);
 
-                    // 1. Tạo đối tượng Item mới
-                    Item newItem = new Item(tex, rect.x, rect.y, name, itemID);
+                        if (rawDialogue != null) {
+                            String[] pages = rawDialogue.split("\\|");
+                            newNPC.addDialogueBranch("DEFAULT", pages);
+                        }
 
-                    // 2. DÒNG QUAN TRỌNG NHẤT: Copy toàn bộ thuộc tính (Properties) từ Tiled vào Item
-                    // Điều này giúp Item biết nó là 'ITEM' hay 'CONTAINER'
-                    newItem.getProperties().putAll(obj.getProperties());
+                        entityManager.addNPC(newNPC);
+                        //System.out.println("Da them NPC" + name);
+                    }
+                    else {
+                        if (ID != null && collectedItems.contains(ID)) {
+                            continue;
+                        }
 
-                    // 3. Thêm vào manager như bình thường
-                    entityManager.addItem(newItem);
+                        Item newItem = new Item(tex, rect.x, rect.y, name, ID);
+                        newItem.getProperties().putAll(props);
+                        entityManager.addItem(newItem);
+                        //System.out.println("Da them items" + name);
+                    }
 
                 } else {
                     Gdx.app.log("MapManager", "Lỗi: Không tìm thấy texture cho key: " + texKey);
