@@ -1,0 +1,29 @@
+{
+  "clues": {
+    "Clue_Body": {
+      "name": "Xác nạn nhân",
+      "dialogue": ["Nạn nhân là ông Harlan, 75 tuổi. Một vết đâm ngay ngực.", "Sắc mặt ông ấy tím tái. Có vẻ lưỡi dao này không phải nguyên nhân duy nhất khiến ông ấy tử vong."],
+      "thought": "Vết đâm này trông rất... chủ động. Như thể chính tay ông ấy đã làm."
+    },
+    "Clue_Wine": {
+      "name": "Chai rượu trên bàn",
+      "dialogue": ["Chai rượu vang vẫn còn mở nút.", "Mùi hạnh nhân đắng nồng nặc (Cyanide). Ly rượu của ông ấy vẫn còn một ít cặn trắng."],
+      "thought": "Kẻ thủ ác đã rót cho ông ấy một ly thuốc độc trước khi cái chết thực sự đến."
+    },
+    "Clue_Window": {
+      "name": "Cửa sổ vỡ",
+      "dialogue": ["Kính vỡ tung tóe trên sàn nhà.", "Lớp rèm lụa mỏng manh này hoàn toàn không có vết xước."],
+      "thought": "Kẻ nào đó đã đập vỡ kính từ bên trong để giả mạo một vụ đột nhập."
+    },
+    "Clue_Knife": {
+      "name": "Kệ dao trống",
+      "dialogue": ["Đây là bộ sưu tập dao của ông ấy. Có một vị trí bị trống.", "Vị trí này vừa khít với con dao đang cắm trên ngực nạn nhân."],
+      "thought": "Con dao đã được lau sạch trước khi cắm vào."
+    },
+    "Clue_Cafe": {
+      "name": "Cốc cafe",
+      "dialogue": ["Cốc café vẫn còn ấm... Hình như ai đó vừa mới rời đi.", "Hùng đẹp trai"],
+      "thought": ""
+    }
+  }
+}
