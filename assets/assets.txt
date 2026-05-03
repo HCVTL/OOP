@@ -25,11 +25,14 @@ BedRoomKhanhDuy/walls_far.tsx
 BedRoomKhanhDuy/wardrobes_BR.png
 BedRoomKhanhDuy/wardrobes_BR.tsx
 BedroomMaster.tmx
+Characters/Fran.png
+Characters/Fran_animation.png
 Garden_map/Houses_Pack/houses.png
 Garden_map/Houses_Pack/houses.psd
 Garden_map/Houses_Pack/public-license.txt
 Garden_map/garden_map.tmx
 Player_animation.png
+Scripts/story_chapter1.json
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/ATTRIBUTION.md
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/LICENSE.txt
 Sprout-Lands-Tilemap-0.2.0/addons/sprout_lands_tilemap/README.md
