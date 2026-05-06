@@ -1,29 +1,88 @@
 {
-  "clues": {
-    "Clue_Body": {
+  "chapter": 1,
+  "global_events": {
+    "intro": {
+      "text": [
+        "Thám tử: Harlan Thrombey... Một triệu phú, một bậc thầy của những câu chuyện trinh thám.",
+        "Thám tử: Trớ trêu thay, chương cuối cùng trong cuộc đời ông ta lại kết thúc bằng một vụ án thực sự.",
+        "Thám tử: Bữa tiệc tối qua không phải để mừng thọ. Nó là một chiến trường của những kẻ tham lam."
+      ],
+      "set_flag": "INTRO_FINISHED"
+    },
+    "enter_scene": {
+      "trigger_flag": "IN_ROOM",
+      "text": ["Thám tử: (nghĩ trong đầu) Mùi sắt nồng nặc... và cả mùi rượu vang. Một sự kết hợp tệ hại."]
+    }
+  },
+  "entities": [
+    {
+      "id": "FRAN",
+      "name": "Quản gia Fran",
+      "type": "npc",
+      "interactions": [
+        {
+          "condition": "DEFAULT",
+          "text": ["(Bàn tay của bà quản gia run rẩy đến mức không tra nổi chìa khóa... Bà ấy thực sự sợ hãi, hay đang cố tình kéo dài thời gian?)"],
+          "set_flag": "TALKED_FRAN_1"
+        },
+        {
+          "condition": "TALKED_FRAN_1",
+          "text": ["Thưa thám tử... tôi đã phục vụ 30 năm. Tôi chưa từng thấy chuyện chẳng lành như thế này bao giờ..."],
+          "set_flag": "IN_ROOM"
+        },
+        {
+          "condition": "IN_ROOM",
+          "text": [
+            "Thưa thám tử... tôi... tôi không dám vào nhìn.",
+            "Bà hãy ở yên đây. Đừng chạm vào bất cứ thứ gì. Tôi cần kiểm tra hiện trường."
+          ]
+        },
+        {
+          "condition": "DEDUCTION_CORRECT",
+          "text": [
+            "Thám tử: Bà Fran, tối qua có ai lên phòng này không?",
+            "Fran: Tôi... tôi thấy cô Linda đi lên lúc 9 giờ tối, rồi sau đó là cậu Ransom...",
+            "Thám tử: Được rồi. Hãy xuống phòng khách. Tôi muốn gặp tất cả bọn họ."
+          ],
+          "set_flag": "CHAPTER_1_COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": "Clue_Body",
       "name": "Xác nạn nhân",
-      "dialogue": ["Nạn nhân là ông Harlan, 75 tuổi. Một vết đâm ngay ngực.", "Sắc mặt ông ấy tím tái. Có vẻ lưỡi dao này không phải nguyên nhân duy nhất khiến ông ấy tử vong."],
-      "thought": "Vết đâm này trông rất... chủ động. Như thể chính tay ông ấy đã làm."
+      "type": "item",
+      "interactions": [
+        {
+          "condition": "DEFAULT",
+          "text": [
+            "Thám tử: Nạn nhân là ông Harlan, 75 tuổi. Một vết đâm ngay ngực.",
+            "Thám tử: (Vết đâm này trông rất... chủ động. Như thể chính tay ông ấy đã làm.)"
+          ],
+          "set_flag": "FOUND_BODY"
+        }
+      ]
     },
-    "Clue_Wine": {
-      "name": "Chai rượu trên bàn",
-      "dialogue": ["Chai rượu vang vẫn còn mở nút.", "Mùi hạnh nhân đắng nồng nặc (Cyanide). Ly rượu của ông ấy vẫn còn một ít cặn trắng."],
-      "thought": "Kẻ thủ ác đã rót cho ông ấy một ly thuốc độc trước khi cái chết thực sự đến."
-    },
-    "Clue_Window": {
-      "name": "Cửa sổ vỡ",
-      "dialogue": ["Kính vỡ tung tóe trên sàn nhà.", "Lớp rèm lụa mỏng manh này hoàn toàn không có vết xước."],
-      "thought": "Kẻ nào đó đã đập vỡ kính từ bên trong để giả mạo một vụ đột nhập."
-    },
-    "Clue_Knife": {
-      "name": "Kệ dao trống",
-      "dialogue": ["Đây là bộ sưu tập dao của ông ấy. Có một vị trí bị trống.", "Vị trí này vừa khít với con dao đang cắm trên ngực nạn nhân."],
-      "thought": "Con dao đã được lau sạch trước khi cắm vào."
-    },
-    "Clue_Cafe": {
-      "name": "Cốc cafe",
-      "dialogue": ["Cốc café vẫn còn ấm... Hình như ai đó vừa mới rời đi.", "Hùng đẹp trai"],
-      "thought": ""
+    {
+      "id": "Clue_Wine",
+      "name": "Chai rượu vang",
+      "type": "item",
+      "interactions": [
+        {
+          "condition": "DEFAULT",
+          "text": [
+            "Thám tử: Chai rượu vang vẫn còn mở nút.",
+            "Thám tử: (Ngửi) Mùi hạnh nhân đắng nồng nặc. Ly rượu vẫn còn ít cặn trắng."
+          ],
+          "set_flag": "FOUND_WINE"
+        }
+      ]
+    }
+  ],
+  "logic_triggers": {
+    "deduction_unlock": {
+      "required_flags": ["FOUND_BODY", "FOUND_WINE", "FOUND_WINDOW", "FOUND_KNIFE"],
+      "set_flag": "READY_TO_DEDUCE"
     }
   }
 }
