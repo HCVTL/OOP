@@ -16,6 +16,8 @@ public class EntityManager {
     private ArrayList<NPC> npcs;
     private Sprite pointerSprite;
 
+    private float interactionCooldown = 0f;
+
     public EntityManager(Sprite pointer) {
         this.items = new ArrayList<>();
         this.npcs = new ArrayList<>();
@@ -31,10 +33,15 @@ public class EntityManager {
     }
 
     public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory, MapManager mapManager, StoryManager storyManager) {
+        if (interactionCooldown > 0) interactionCooldown -= delta;
+        if (dialogueManager.isActive() || interactionCooldown > 0) return;
+
         for (Item item : items) {
             if (!item.isCollected() && player.isNear(item)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                     handleItemInteraction(item, dialogueManager, inventory, mapManager, storyManager);
+                    interactionCooldown = 2f;
+                    return;
                 }
             }
         }
@@ -42,7 +49,9 @@ public class EntityManager {
         for (NPC npc : npcs) {
             if (player.isNear(npc)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    handleNPCInteraction(npc, dialogueManager);
+                    handleNPCInteraction(npc, dialogueManager, storyManager);
+                    interactionCooldown = 2f;
+                    return;
                 }
             }
         }
@@ -51,76 +60,58 @@ public class EntityManager {
     public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager, StoryManager story) {
         String id = item.getID();
 
-        // 1. Tìm dữ liệu trong JSON thông qua StoryManager
-
         if (!dm.isActive()) {
-            // Lần nhấn E đầu tiên: Lấy thoại từ JSON
-            JsonValue clueData = story.getClueData(id);
-            if (clueData != null) {
-                String name = clueData.getString("name");
-                String[] dialogue = clueData.get("dialogue").asStringArray();
-                dm.startDialogue(name, dialogue);
+            // Lấy dữ liệu tên và thoại từ cấu trúc JSON mới
+            String name = story.getEntityName(id);
+            String[] dialogue = story.getValidInteraction(id);
 
-                // Đánh dấu đã tìm thấy manh mối trong StoryManager
-                markStoryProgress(id, story);
-            } else {
-                // Nếu không có trong JSON (vật phẩm rác), dùng tên từ Tiled
-                dm.startDialogue("Thám tử", new String[]{"Đây là " + item.getName() + "."});
-            }
-        }
-        else {
-            // Các lần nhấn E sau: Chạy nốt thoại và nhặt đồ
+            dm.startDialogue(name, dialogue);
 
-            boolean wasLastPage = dm.isLastPage() && dm.isFinished();
-
-            dm.nextPage();
-
-            if (wasLastPage) {
-                String type = item.getProperties().get("type", String.class);
-                if ("ITEM".equals(type)) {
+            // Xử lý nhặt đồ (Giữ nguyên logic loại ITEM)
+            String type = item.getProperties().get("type", String.class);
+            if ("ITEM".equals(type)) {
+                if (!item.isCollected()) {
                     item.collect();
                     inventory.addItem(item);
                     mapManager.getCollectedItems().add(id);
                 }
-                else if ("CONTAINER".equals(type)) {
-                    handleContainerLogic(item, dm, inventory, mapManager);
-                }
+            }
+            else if ("CONTAINER".equals(type)) {
+                handleContainerLogic(item, dm, inventory, mapManager, story);
             }
         }
-    }
-
-    // Hàm phụ để đánh dấu tiến trình cốt truyện
-    private void markStoryProgress(String id, StoryManager story) {
-        if ("Clue_Body".equals(id)) story.foundBody = true;
-        else if ("Clue_Wine".equals(id)) story.foundWine = true;
-        else if ("Clue_Window".equals(id)) story.foundWindow = true;
-        else if ("Clue_Knife".equals(id)) story.foundKnife = true;
     }
 
     // Tách riêng logic Container cho sạch code
-    private void handleContainerLogic(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager) {
+    private void handleContainerLogic(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager, StoryManager story) {
         String itemInsideName = item.getProperties().get("containsItem", String.class);
+
         if (itemInsideName != null && !itemInsideName.isEmpty()) {
             Texture texKey = mapManager.getItemLibrary().get(itemInsideName);
             if (texKey != null) {
+                // Tạo item mới từ trong container
                 Item newItem = new Item(texKey, 0, 0, itemInsideName, "FOUND_" + itemInsideName);
                 inventory.addItem(newItem);
 
-                // Cập nhật trạng thái trực tiếp vào properties của item để lần sau tương tác sẽ khác
+                // Ghi nhận flag đã mở container vào StoryManager
+                story.setFlag("OPENED_" + item.getID());
+
+                // Cập nhật trạng thái item ngay trong Tiled Properties để tránh lặp lại
                 item.getProperties().put("containsItem", "");
-                item.getProperties().put("dialogue", item.getName() + "bây giờ trống không!");
-                dm.startDialogue("Thám tử", new String[]{"Tôi tìm thấy một " + itemInsideName + "!"});
+
+                // Thông báo nhặt được đồ
+                dm.startDialogue("Thám tử", new String[]{"Tôi tìm thấy một " + itemInsideName + " bên trong!"});
             }
         }
     }
 
-    public void handleNPCInteraction(NPC npc, DialogueManager dm) {
+    public void handleNPCInteraction(NPC npc, DialogueManager dm, StoryManager story) {
         if (!dm.isActive()) {
-            String[] pages = npc.getDialogue("DEFAULT");
-            dm.startDialogue(npc.getName(), npc.getDialogue("DEFAULT"));
-        }
-        else {
-            dm.closeDialogue();
+            // Class StoryManager sẽ tự biết lấy câu nào dựa trên Flag[cite: 1, 2]
+            String[] dialogue = story.getValidInteraction(npc.getID());
+            String name = story.getEntityName(npc.getID());
+
+            dm.startDialogue(name, dialogue);
         }
     }
 

@@ -105,18 +105,8 @@ public class GameScreen implements Screen {
         // 1. Setup Camera & Viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(800, 480, camera);
-
         uiViewport = new FitViewport(800, 480);
         stage = new Stage(uiViewport, batch);
-        // UI overlay (ESC confirm)
-        uiStage = new Stage(uiViewport, batch);
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(uiStage);
-        multiplexer.addProcessor(stage);
-        Gdx.input.setInputProcessor(multiplexer);
-
-        // Khởi tạo Font và Giao diện trước khi tạo Dialog
-        setupGameUiFont();
 
         // 3. Load Mũi tên trên item và npc
         Texture arrowTex = new Texture("arrow.png");
@@ -129,6 +119,19 @@ public class GameScreen implements Screen {
         inventoryManager= new InventoryManager();
         mapManager = new MapManager(entityManager);
         storyManager = new StoryManager();
+
+        // UI overlay (ESC confirm)
+        uiStage = new Stage(uiViewport, batch);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(dialogueManager);
+        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
+
+        // Khởi tạo Font và Giao diện trước khi tạo Dialog
+        setupGameUiFont();
+
+
         inventoryUI = new InventoryUI();
         // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
         Texture playerTexture = new Texture("player_animation.png");
@@ -137,9 +140,15 @@ public class GameScreen implements Screen {
 
 
         // --- CHUẨN BỊ THÔNG SỐ (Nếu là New Game) ---
-        String mapPathToLoad = "living_room.tmx";
-        float startX = 100f;
-        float startY = 100f;
+        String mapPathToLoad = "hall.tmx";
+        float startX = 50f;
+        float startY = 50f;
+
+        // --- LOAD MAP ---
+        mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
+
+        // Intro Chuong 1
+        dialogueManager.startDialogue("Thám tử", storyManager.getIntro());
 
         // --- ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU ---
         if (loadOnStart) {
@@ -169,9 +178,6 @@ public class GameScreen implements Screen {
                 }
             }
         }
-
-        // --- BÂY GIỜ MỚI LOAD MAP ---
-        mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
     }
 
     private Drawable createSolidBackground(Color color) {

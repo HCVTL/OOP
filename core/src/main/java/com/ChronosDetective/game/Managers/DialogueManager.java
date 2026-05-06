@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class DialogueManager {
+public class DialogueManager implements com.badlogic.gdx.InputProcessor{
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Viewport viewport;
@@ -169,4 +169,23 @@ public class DialogueManager {
         shapeRenderer.dispose();
         font.dispose();
     }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if (isActive && keycode == com.badlogic.gdx.Input.Keys.E) {
+            nextPage(); // Tự xử lý lật trang khi nhấn E
+            return true; // "Nuốt" phím E để các hệ thống khác không nhận được nữa
+        }
+        return false;
+    }
+
+    // Các hàm khác của InputProcessor chỉ cần return false
+    @Override public boolean keyUp(int keycode) { return false; }
+    @Override public boolean keyTyped(char character) { return false; }
+    @Override public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
+    @Override public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
+    @Override public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
+    @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
+    @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
+    @Override public boolean scrolled(float amountX, float amountY) { return false; }
 }
