@@ -282,7 +282,7 @@ public class GameScreen implements Screen {
         batch.end();
 
 
-        // Trong GameScreen.render() sau khi vẽ batch.end()
+     /*   // Trong GameScreen.render() sau khi vẽ batch.end()
         debugRenderer.setProjectionMatrix(camera.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.RED);
@@ -300,7 +300,7 @@ public class GameScreen implements Screen {
         Rectangle pb = player.getBounds();
         debugRenderer.rect(pb.x, pb.y, pb.width, pb.height);
         debugRenderer.end();
-
+*/
 
         // 3. Vẽ UI (Hộp thoại trên cùng)
         dialogueManager.draw(batch);

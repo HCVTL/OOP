@@ -10,10 +10,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout; // Sửa lại hộp thoại cho fit text
+import com.badlogic.gdx.utils.Align;
 
 public class DialogueManager implements com.badlogic.gdx.InputProcessor{
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
+    private GlyphLayout layout;
     private Viewport viewport;
     private OrthographicCamera camera;
 
@@ -35,6 +38,7 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
         this.viewport = viewport;
         this.camera = camera;
         this.shapeRenderer = new ShapeRenderer();
+        this.layout = new GlyphLayout();
 
         // --- KHỞI TẠO FONT CHẤT LƯỢNG CAO (GIỐNG SWING) ---
         // Thay "fonts/arial.ttf" bằng đường dẫn font của bạn
@@ -124,44 +128,78 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
 
         float zoom = camera.zoom;
 
-        // --- 2. VẼ KHUNG ĐỐI THOẠI (DÙNG SHAPERENDERER) ---
+        // 2. TÍNH TOÁN KÍCH THƯỚC HỘP ĐỘNG
+        font.getData().setScale(zoom);
+
+        float boxW = (viewport.getWorldWidth() - 80) * zoom;
+        float textTargetWidth = boxW - (60 * zoom);
+
+// Đo chiều cao toàn bộ đoạn thoại bằng layout
+        layout.setText(font, fullText, Color.WHITE, textTargetWidth, Align.left, true);
+        float textHeight = layout.height;
+        float nameHeight = font.getLineHeight();
+
+// Cài đặt lề (Padding)
+        float paddingTop = 20 * zoom;
+        float paddingMiddle = 15 * zoom;
+        float paddingBottom = 45 * zoom;
+
+// Chiều cao linh hoạt (Có chặn đáy tối thiểu 120 để hộp không bị quá xẹp)
+        float boxH = paddingTop + nameHeight + paddingMiddle + textHeight + paddingBottom;
+        if (boxH < 120 * zoom) boxH = 120 * zoom;
+
+        float boxX = camera.position.x - boxW / 2;
+        float boxY = camera.position.y - (viewport.getWorldHeight() / 2 * zoom) + (zoom * 40);
+
+        // 3. VẼ KHUNG CÓ VIỀN VÀ BO GÓC
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        // Màu nền đen mờ (Alpha = 0.8)
+        float radius = 12 * zoom;
+        float border = 3 * zoom;
+
+        // Viền nền (trắng/xám)
+        shapeRenderer.setColor(new Color(0.8f, 0.8f, 0.8f, 1f));
+        drawFilledRoundedRect(boxX - border, boxY - border, boxW + border * 2, boxH + border * 2, radius + border);
+
+        // Nền khung thoại (đen mờ)
         shapeRenderer.setColor(0, 0, 0, 0.8f);
+        drawFilledRoundedRect(boxX, boxY, boxW, boxH, radius);
 
-        float boxW = (viewport.getWorldWidth() - 80) * zoom;
-        float boxH = 110 * zoom;
-        float boxX = camera.position.x - boxW / 2;
-        float boxY = camera.position.y - (viewport.getWorldHeight() / 2 * zoom) + (zoom * 40);
-
-        shapeRenderer.rect(boxX, boxY, boxW, boxH);
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        // --- 3. VẼ CHỮ (DÙNG SPRITEBATCH) ---
+        // --- 4. VẼ CHỮ (DÙNG SPRITEBATCH) ---
         batch.begin();
 
-        // Giữ nguyên scale gốc để font sắc nét nhất
-        font.getData().setScale(zoom);
+        float currentY = boxY + boxH - paddingTop;
 
-        // Vẽ tên người nói (Màu vàng Cyan hoặc Yellow)
+        // Vẽ tên
         font.setColor(Color.CYAN);
-        font.draw(batch, speakerName + ":", boxX + (30 * zoom), boxY + boxH - (20 * zoom));
+        font.draw(batch, speakerName + ":", boxX + (30 * zoom), currentY);
 
-        // Vẽ nội dung (Màu trắng mờ nhẹ cho đỡ chói)
+        // Vẽ nội dung
+        currentY -= (nameHeight + paddingMiddle);
         font.setColor(new Color(0.95f, 0.95f, 0.95f, 1f));
-        font.draw(batch, currentText, boxX + (30 * zoom), boxY + boxH - (55 * zoom), boxW - (60 * zoom), -1, true);
+        font.draw(batch, currentText, boxX + (30 * zoom), currentY, textTargetWidth, Align.left, true);
 
-        // Vẽ hint khi chạy xong chữ
+        // Vẽ phím Hint căn chuẩn góc phải
         if (isFinished()) {
-            font.getData().setScale(camera.zoom * 0.75f);
+            String hintText = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
+            font.getData().setScale(zoom * 0.75f);
+
+            layout.setText(font, hintText);
+            float hintWidth = layout.width;
+            float hintHeight = layout.height;
+
+            float hintX = boxX + boxW - hintWidth - (20 * zoom);
+            float hintY = boxY + hintHeight + (15 * zoom);
+
             font.setColor(Color.GRAY);
-            String hint = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
-            font.draw(batch, hint, boxX + boxW - (180 * camera.zoom), boxY + (25 * camera.zoom));
+            font.draw(batch, hintText, hintX, hintY);
         }
+
         batch.end();
     }
 
@@ -188,4 +226,14 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
     @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
     @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
     @Override public boolean scrolled(float amountX, float amountY) { return false; }
+
+    private void drawFilledRoundedRect(float x, float y, float width, float height, float radius) {
+        shapeRenderer.rect(x + radius, y, width - 2 * radius, height);
+        shapeRenderer.rect(x, y + radius, radius, height - 2 * radius);
+        shapeRenderer.rect(x + width - radius, y + radius, radius, height - 2 * radius);
+        shapeRenderer.arc(x + radius, y + radius, radius, 180f, 90f, 20);
+        shapeRenderer.arc(x + width - radius, y + radius, radius, 270f, 90f, 20);
+        shapeRenderer.arc(x + width - radius, y + height - radius, radius, 0f, 90f, 20);
+        shapeRenderer.arc(x + radius, y + height - radius, radius, 90f, 90f, 20);
+    }
 }
