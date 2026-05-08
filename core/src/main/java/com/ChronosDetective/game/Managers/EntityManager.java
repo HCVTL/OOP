@@ -1,17 +1,22 @@
 package com.ChronosDetective.game.Managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.NPC;
 import com.ChronosDetective.game.Entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.JsonValue;
+
 import java.util.ArrayList;
 
 public class EntityManager {
     private ArrayList<Item> items;
     private ArrayList<NPC> npcs;
     private Sprite pointerSprite;
+
+    private float interactionCooldown = 0f;
 
     public EntityManager(Sprite pointer) {
         this.items = new ArrayList<>();
@@ -27,11 +32,16 @@ public class EntityManager {
         npcs.add(npc);
     }
 
-    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory, MapManager mapManager) {
+    public void update(float delta, Player player, DialogueManager dialogueManager, InventoryManager inventory, MapManager mapManager, StoryManager storyManager) {
+        if (interactionCooldown > 0) interactionCooldown -= delta;
+        if (dialogueManager.isActive() || interactionCooldown > 0) return;
+
         for (Item item : items) {
             if (!item.isCollected() && player.isNear(item)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    handleItemInteraction(item, dialogueManager, inventory, mapManager);
+                    handleItemInteraction(item, dialogueManager, inventory, mapManager, storyManager);
+                    interactionCooldown = 2f;
+                    return;
                 }
             }
         }
@@ -39,69 +49,69 @@ public class EntityManager {
         for (NPC npc : npcs) {
             if (player.isNear(npc)) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                    handleNPCInteraction(npc, dialogueManager);
+                    handleNPCInteraction(npc, dialogueManager, storyManager);
+                    interactionCooldown = 2f;
+                    return;
                 }
             }
         }
     }
 
-    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager) {
-    // 1. Lấy thông tin từ Properties của Item (đã set từ Tiled)
-    String type = item.getProperties().get("type", String.class);
-    String customDialogue = item.getProperties().get("dialogue", String.class);
+    public void handleItemInteraction(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager, StoryManager story) {
+        String id = item.getID();
 
-    // Nếu không có thoại riêng trong Tiled, dùng thoại mặc định
-    if (customDialogue == null) {
-        customDialogue = "Đây là " + item.getName() + ".";
-    }
+        if (!dm.isActive()) {
+            // Lấy dữ liệu tên và thoại từ cấu trúc JSON mới
+            String name = story.getEntityName(id);
+            String[] dialogue = story.getValidInteraction(id);
 
-    if (!dm.isActive()) {
-        // Lần nhấn E đầu tiên: Hiện thoại
-        dm.startDialogue("Thám tử", customDialogue);
-    } 
-    else {
-        // Lần nhấn E thứ hai (khi hộp thoại đang mở): Xử lý logic
-        dm.closeDialogue();
+            dm.startDialogue(name, dialogue);
 
-        if ("ITEM".equals(type)) {
-            // LOGIC CHO CAFE: Nhặt xong là biến mất
-            item.collect();
-            inventory.addItem(item);
-            mapManager.getCollectedItems().add(item.getID());
-            System.out.println("Đã nhặt: " + item.getName());
-        } 
-        else if ("CONTAINER".equals(type)) {
-            // LOGIC CHO NGĂN TỦ: Nhả chìa khóa nhưng tủ KHÔNG biến mất
-            Object hasKeyObj = item.getProperties().get("hasKey");
-            boolean hasKey = false;
-            
-            if (hasKeyObj instanceof Boolean) hasKey = (Boolean) hasKeyObj;
-            else if (hasKeyObj instanceof String) hasKey = Boolean.parseBoolean((String) hasKeyObj);
-
-            if (hasKey) {
-                // Tạo item chìa khóa từ texture trong library
-                com.badlogic.gdx.graphics.Texture keyTex = mapManager.getItemLibrary().get("key_item");
-                Item keyItem = new Item(keyTex, 0, 0, "Chìa khóa", "KEY_01");
-                
-                inventory.addItem(keyItem);
-                
-                // Đánh dấu tủ đã hết đồ
-                item.getProperties().put("hasKey", false);
-                // Đổi dialogue để lần sau nhấn E vào tủ nó nói câu khác
-                item.getProperties().put("dialogue", "Ngăn tủ này giờ trống rỗng.");
-                
-                dm.startDialogue("Thám tử", "Tôi tìm thấy một chiếc chìa khóa!");
+            // Xử lý nhặt đồ (Giữ nguyên logic loại ITEM)
+            String type = item.getProperties().get("type", String.class);
+            if ("ITEM".equals(type)) {
+                if (!item.isCollected()) {
+                    item.collect();
+                    inventory.addItem(item);
+                    mapManager.getCollectedItems().add(id);
+                }
+            }
+            else if ("CONTAINER".equals(type)) {
+                handleContainerLogic(item, dm, inventory, mapManager, story);
             }
         }
     }
-}
 
-    public void handleNPCInteraction(NPC npc, DialogueManager dm) {
-        if (!dm.isActive()) {
-            dm.startDialogue(npc.getName(), npc.getDialogue());
+    // Tách riêng logic Container cho sạch code
+    private void handleContainerLogic(Item item, DialogueManager dm, InventoryManager inventory, MapManager mapManager, StoryManager story) {
+        String itemInsideName = item.getProperties().get("containsItem", String.class);
+
+        if (itemInsideName != null && !itemInsideName.isEmpty()) {
+            Texture texKey = mapManager.getItemLibrary().get(itemInsideName);
+            if (texKey != null) {
+                // Tạo item mới từ trong container
+                Item newItem = new Item(texKey, 0, 0, itemInsideName, "FOUND_" + itemInsideName);
+                inventory.addItem(newItem);
+
+                // Ghi nhận flag đã mở container vào StoryManager
+                story.setFlag("OPENED_" + item.getID());
+
+                // Cập nhật trạng thái item ngay trong Tiled Properties để tránh lặp lại
+                item.getProperties().put("containsItem", "");
+
+                // Thông báo nhặt được đồ
+                dm.startDialogue("Thám tử", new String[]{"Tôi tìm thấy một " + itemInsideName + " bên trong!"});
+            }
         }
-        else {
-            dm.closeDialogue();
+    }
+
+    public void handleNPCInteraction(NPC npc, DialogueManager dm, StoryManager story) {
+        if (!dm.isActive()) {
+            // Class StoryManager sẽ tự biết lấy câu nào dựa trên Flag[cite: 1, 2]
+            String[] dialogue = story.getValidInteraction(npc.getID());
+            String name = story.getEntityName(npc.getID());
+
+            dm.startDialogue(name, dialogue);
         }
     }
 

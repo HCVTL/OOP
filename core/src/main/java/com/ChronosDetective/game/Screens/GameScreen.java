@@ -1,5 +1,6 @@
 package com.ChronosDetective.game.Screens;
 
+import com.ChronosDetective.game.Managers.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -37,10 +38,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ChronosDetective.game.ChronosDetectiveGame;
 import com.ChronosDetective.game.Entities.Item;
 import com.ChronosDetective.game.Entities.Player;
-import com.ChronosDetective.game.Managers.DialogueManager;
-import com.ChronosDetective.game.Managers.EntityManager;
-import com.ChronosDetective.game.Managers.InventoryManager;
-import com.ChronosDetective.game.Managers.MapManager;
 import com.ChronosDetective.game.UI.InventoryUI;
 import com.ChronosDetective.game.Save.SaveData;
 import com.ChronosDetective.game.Save.SaveRepository;
@@ -68,6 +65,7 @@ public class GameScreen implements Screen {
     private DialogueManager dialogueManager;
     private InventoryManager inventoryManager;
     private MapManager mapManager;
+    private StoryManager storyManager;
 
     private Sprite pointerSprite;
 
@@ -107,18 +105,8 @@ public class GameScreen implements Screen {
         // 1. Setup Camera & Viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(800, 480, camera);
-
         uiViewport = new FitViewport(800, 480);
         stage = new Stage(uiViewport, batch);
-        // UI overlay (ESC confirm)
-        uiStage = new Stage(uiViewport, batch);
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(uiStage);
-        multiplexer.addProcessor(stage);
-        Gdx.input.setInputProcessor(multiplexer);
-
-        // Khởi tạo Font và Giao diện trước khi tạo Dialog
-        setupGameUiFont();
 
         // 3. Load Mũi tên trên item và npc
         Texture arrowTex = new Texture("arrow.png");
@@ -130,25 +118,64 @@ public class GameScreen implements Screen {
         entityManager = new EntityManager(pointerSprite);
         inventoryManager= new InventoryManager();
         mapManager = new MapManager(entityManager);
+        storyManager = new StoryManager();
 
+        // UI overlay (ESC confirm)
+        uiStage = new Stage(uiViewport, batch);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(dialogueManager);
+        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
 
-        // 5. Khởi tạo Player
-        Texture playerTexture = new Texture("player_animation.png");
-        player = new Player(playerTexture, 100, 100, null); // Cho player đứng ở (100,100)
+        // Khởi tạo Font và Giao diện trước khi tạo Dialog
+        setupGameUiFont();
 
-        mapManager.loadMap("map.tmx", player, 100, 100);
-
-        camera.zoom = 0.8f;
-        camera.update();
 
         inventoryUI = new InventoryUI();
-        //Texture butlerTex = new Texture("butler.png");
-        //entityManager.addNPC(new NPC(butlerTex, 400, 300, "Quan gia", "Toi da thay mot bong den..."));
+        // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
+        Texture playerTexture = new Texture("player_animation.png");
+        // Đảm bảo bạn CÓ dòng này và nó không bị comment //
+        player = new Player(playerTexture, 100, 100, null);
 
+
+        // --- CHUẨN BỊ THÔNG SỐ (Nếu là New Game) ---
+        String mapPathToLoad = "hall.tmx";
+        float startX = 50f;
+        float startY = 50f;
+
+        // --- LOAD MAP ---
+        mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
+
+        // Intro Chuong 1
+        dialogueManager.startDialogue("Thám tử", storyManager.getIntro());
+
+        // --- ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU ---
         if (loadOnStart) {
             SaveData data = saves.loadGame(sessionId);
             if (data != null) {
-                player.setPosition(data.playerX, data.playerY);
+                // 1. Lấy lại tọa độ và Map
+                startX = data.playerX;
+                startY = data.playerY;
+                if (data.currentMapName != null) {
+                    mapPathToLoad = data.currentMapName;
+                }
+
+                // 2. Trả lại Sổ đen cho MapManager
+                if (data.collectedItemIds != null) {
+                    mapManager.setCollectedItems(data.collectedItemIds);
+                }
+
+                // 3. Phục hồi Túi Đồ
+                if (data.inventoryItemIds != null) {
+                    for (String itemId : data.inventoryItemIds) {
+                        Item restoredItem = mapManager.createItemFromId(itemId);
+                        if (restoredItem != null) {
+                            restoredItem.collect(); // Phải gọi để nó ko vẽ ra màn hình
+                            inventoryManager.addItem(restoredItem);
+                        }
+                    }
+                }
             }
         }
     }
@@ -220,20 +247,15 @@ public class GameScreen implements Screen {
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
-        mapManager.update(delta);
-
         // 2. Cập nhật logic (Quan trọng!)
         if (!isAnyOverlayOpen) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                mapManager.tryToggleKitchenDoor(player);
-            }
             player.update(delta);
             // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
-                mapManager.loadMap(targetMap, player, x, y);
+                mapManager.loadMap(targetMap,targetMap, player, x, y);
             });
         }
-        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager);
+        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager, storyManager);
 
         // 3. Cập nhật Camera đuổi theo nhân vật
         float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)
@@ -257,11 +279,6 @@ public class GameScreen implements Screen {
         batch.begin();
             player.draw(batch);
             entityManager.draw(batch, player);
-            if (mapManager.shouldShowKitchenDoorHint(player)) {
-                gameUiFont.setColor(Color.YELLOW);
-                gameUiFont.draw(batch, "Bam E de mo cua", player.getX() - 40f, player.getY() + 85f);
-                gameUiFont.setColor(Color.WHITE);
-            }
         batch.end();
 
 
@@ -270,14 +287,12 @@ public class GameScreen implements Screen {
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.RED);
 
-        // Debug: khung vùng chuyển map (Portals hoặc Door tùy map)
-        MapLayer portalLayer = mapManager.getPortalTransitionLayer();
-        if (portalLayer != null) {
-            for (MapObject obj : portalLayer.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                    debugRenderer.rect(r.x, r.y, r.width, r.height);
-                }
+        // Vẽ thử cái khung của Portal
+        MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                debugRenderer.rect(r.x, r.y, r.width, r.height);
             }
         }
 
@@ -400,6 +415,13 @@ public class GameScreen implements Screen {
                     data.sessionId = targetSession;
                     data.playerX = player.getX();
                     data.playerY = player.getY();
+                    data.currentMapName = mapManager.getCurrentMapName();
+                    data.collectedItemIds.clear();
+                    data.collectedItemIds.addAll(mapManager.getCollectedItems());
+                    data.inventoryItemIds.clear();
+                    for (Item item : inventoryManager.getItems()) {
+                        data.inventoryItemIds.add(item.getID());
+                    }
                     data.savedAtEpochMs = System.currentTimeMillis();
                     saves.saveGame(data);
                 }

@@ -133,36 +133,41 @@ public class Player extends Entity{
             }
         }
 
-        batch.draw(currentFrame, position.x, position.y, width, height);
+        float drawY = position.y;
+        // Offset khi walk: chỉnh chân khớp với khung sprite (baseline frame đi khác idle)
+        if (currentState == State.WALKING) {
+            drawY -= 4f;
+        }
+        batch.draw(currentFrame, position.x, drawY, width, height);
     }
 
     public boolean isCollision(float worldX, float worldY) {
-    // 1. Lấy đúng tên các Layer từ ảnh Tiled của thám tử
-    TiledMapTileLayer fenceLayer = (TiledMapTileLayer) map.getLayers().get("Fences");
-    TiledMapTileLayer wallLayer = (TiledMapTileLayer) map.getLayers().get("Wall");    // Chữ W viết hoa
-    TiledMapTileLayer decorLayer = (TiledMapTileLayer) map.getLayers().get("Decor");  // Tên mới theo ảnh
-    TiledMapTileLayer doorBlockLayer = (TiledMapTileLayer) map.getLayers().get("DoorBlock");
+        // 1. Danh sách tất cả các lớp vật cản
+        String[] solidLayers = {"Wall", "Fences", "Decor"};
 
-    // 2. Chuyển đổi tọa độ
-    int tileX = (int)(worldX / 16);
-    int tileY = (int)(worldY / 16);
+        int tileX = (int)(worldX / 16);
+        int tileY = (int)(worldY / 16);
 
-    // 3. Kiểm tra an toàn để không bị crash game
-    TiledMapTileLayer refLayer = (wallLayer != null) ? wallLayer : (decorLayer != null ? decorLayer : fenceLayer);
-    if (refLayer == null) return false;
+        for (String name : solidLayers) {
+            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(name);
 
-    if (tileX < 0 || tileY < 0 || tileX >= refLayer.getWidth() || tileY >= refLayer.getHeight()) {
-        return true;
+            // Nếu map không có lớp này thì bỏ qua, tìm lớp tiếp theo
+            if (layer == null) continue;
+
+            // 2. Check giới hạn bản đồ dựa trên lớp đang xét
+            if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) {
+                return true; // Chặn nếu đi ra ngoài biên
+            }
+
+            // 3. Nếu tại ô gạch này có Tile (Cell != null) -> Có vật cản
+            if (layer.getCell(tileX, tileY) != null) {
+                return true; // Chỉ cần chạm 1 lớp là đủ để chặn lại
+            }
+        }
+
+        return false; // Đi xuyên qua thoải mái nếu không chạm lớp nào
     }
 
-    // 4. Logic kiểm tra va chạm
-    boolean blockedByFence = fenceLayer != null && fenceLayer.getCell(tileX, tileY) != null;
-    boolean blockedByWall = wallLayer != null && wallLayer.getCell(tileX, tileY) != null;
-    boolean blockedByDecor = decorLayer != null && decorLayer.getCell(tileX, tileY) != null;
-    boolean blockedByDoor = doorBlockLayer != null && doorBlockLayer.getCell(tileX, tileY) != null;
-
-    return blockedByFence || blockedByWall || blockedByDecor || blockedByDoor;
-}
     private boolean checkCollisionAtPoints(float x, float y) {
         float pX = 20f;
         float pY = 10f;

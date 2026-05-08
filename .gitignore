@@ -1,11 +1,43 @@
-.classpath
+# --- IDE Files ---
+.idea/
+*.iml
 .project
+.classpath
+.settings/
+bin/
+gen/
+out/
 
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
+# --- Build Folders (Quan trọng nhất) ---
+.gradle/
+build/
+**/build/
+core/build/
+lwgl3/build/
+android/build/
+ios/build/
+html/build/
 
+# --- Compiled Files ---
+*.class
+*.jar
+*.war
+*.ear
 
+# --- Temporary/Log Files ---
+*.log
+*.bin
+*.lock
+*.tmp
 .DS_Store
+
+# --- Game Data (File Save cá nhân) ---
+saves/
 /saves/
+
+# --- NetBeans (Nếu có) ---
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+
