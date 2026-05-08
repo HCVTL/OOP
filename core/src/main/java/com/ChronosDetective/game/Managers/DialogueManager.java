@@ -128,63 +128,95 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
 
         float zoom = camera.zoom;
 
-        // 2. TÍNH TOÁN KÍCH THƯỚC HỘP ĐỘNG
+        // --- 2. TÍNH TOÁN KÍCH THƯỚC HỘP ĐỘNG ---
         font.getData().setScale(zoom);
 
         float boxW = (viewport.getWorldWidth() - 80) * zoom;
         float textTargetWidth = boxW - (60 * zoom);
 
-// Đo chiều cao toàn bộ đoạn thoại bằng layout
         layout.setText(font, fullText, Color.WHITE, textTargetWidth, Align.left, true);
         float textHeight = layout.height;
-        float nameHeight = font.getLineHeight();
 
-// Cài đặt lề (Padding)
-        float paddingTop = 20 * zoom;
-        float paddingMiddle = 15 * zoom;
+        // Không cần nameHeight và paddingMiddle nữa
+        float paddingTop = 25 * zoom;
         float paddingBottom = 45 * zoom;
 
-// Chiều cao linh hoạt (Có chặn đáy tối thiểu 120 để hộp không bị quá xẹp)
-        float boxH = paddingTop + nameHeight + paddingMiddle + textHeight + paddingBottom;
-        if (boxH < 120 * zoom) boxH = 120 * zoom;
+        // Chiều cao khung chính bây giờ chỉ phụ thuộc vào Nội dung
+        float boxH = paddingTop + textHeight + paddingBottom;
+        if (boxH < 100 * zoom) boxH = 100 * zoom; // Giảm độ cao tối thiểu xuống một chút
 
         float boxX = camera.position.x - boxW / 2;
         float boxY = camera.position.y - (viewport.getWorldHeight() / 2 * zoom) + (zoom * 40);
 
-        // 3. VẼ KHUNG CÓ VIỀN VÀ BO GÓC
+        // --- TÍNH TOÁN KHUNG TÊN (NAME BOX) ---
+        float nameBoxW = 0, nameBoxH = 0, nameBoxX = 0, nameBoxY = 0;
+        boolean hasName = speakerName != null && !speakerName.trim().isEmpty();
+
+        if (hasName) {
+            // Đo chiều dài của Tên để khung ôm vừa khít
+            layout.setText(font, speakerName);
+            float nameTextWidth = layout.width;
+            float nameTextHeight = layout.height;
+
+            // Padding cho khung tên (nhỏ hơn khung chính)
+            nameBoxW = nameTextWidth + (40 * zoom);
+            nameBoxH = nameTextHeight + (20 * zoom);
+
+            // Đặt khung tên nhô lên ở góc trái, lùi vào 20px so với mép trái khung chính
+            nameBoxX = boxX + (20 * zoom);
+
+            // Y nằm đè lên mép trên của khung chính một chút (trừ đi 10*zoom để tạo độ kết nối)
+            nameBoxY = boxY + boxH - (10 * zoom);
+        }
+
+        // --- 3. VẼ CÁC KHUNG (SHAPERENDERER) ---
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         float radius = 12 * zoom;
         float border = 3 * zoom;
+        Color borderColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+        Color bgColor = new Color(0, 0, 0, 0.8f);
 
-        // Viền nền (trắng/xám)
-        shapeRenderer.setColor(new Color(0.8f, 0.8f, 0.8f, 1f));
+        // 3.1. VẼ KHUNG CHÍNH
+        shapeRenderer.setColor(borderColor);
         drawFilledRoundedRect(boxX - border, boxY - border, boxW + border * 2, boxH + border * 2, radius + border);
-
-        // Nền khung thoại (đen mờ)
-        shapeRenderer.setColor(0, 0, 0, 0.8f);
+        shapeRenderer.setColor(bgColor);
         drawFilledRoundedRect(boxX, boxY, boxW, boxH, radius);
+
+        // 3.2. VẼ KHUNG TÊN (Nếu NPC/Player có tên)
+        if (hasName) {
+            float nameRadius = 8 * zoom; // Góc bo của khung tên nhỏ hơn cho tinh tế
+
+            shapeRenderer.setColor(borderColor);
+            drawFilledRoundedRect(nameBoxX - border, nameBoxY - border, nameBoxW + border * 2, nameBoxH + border * 2, nameRadius + border);
+            shapeRenderer.setColor(bgColor);
+            drawFilledRoundedRect(nameBoxX, nameBoxY, nameBoxW, nameBoxH, nameRadius);
+        }
 
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        // --- 4. VẼ CHỮ (DÙNG SPRITEBATCH) ---
+        // --- 4. VẼ CHỮ (SPRITEBATCH) ---
         batch.begin();
 
-        float currentY = boxY + boxH - paddingTop;
+        // Vẽ Tên vào Khung Tên
+        if (hasName) {
+            font.setColor(Color.CYAN);
+            // Căn giữa chữ vào khung tên
+            float nameDrawX = nameBoxX + (20 * zoom);
+            // LibGDX vẽ chữ từ trên xuống, nên Y = Mép trên của khung tên - padding
+            float nameDrawY = nameBoxY + nameBoxH - (10 * zoom);
+            font.draw(batch, speakerName, nameDrawX, nameDrawY);
+        }
 
-        // Vẽ tên
-        font.setColor(Color.CYAN);
-        font.draw(batch, speakerName + ":", boxX + (30 * zoom), currentY);
-
-        // Vẽ nội dung
-        currentY -= (nameHeight + paddingMiddle);
+        // Vẽ Nội Dung vào Khung Chính
+        float currentY = boxY + boxH - paddingTop; // Không cần trừ nameHeight nữa
         font.setColor(new Color(0.95f, 0.95f, 0.95f, 1f));
         font.draw(batch, currentText, boxX + (30 * zoom), currentY, textTargetWidth, Align.left, true);
 
-        // Vẽ phím Hint căn chuẩn góc phải
+        // Nút Hint bám góc phải (Giữ nguyên như cũ)
         if (isFinished()) {
             String hintText = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
             font.getData().setScale(zoom * 0.75f);
