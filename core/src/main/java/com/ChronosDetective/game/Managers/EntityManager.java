@@ -65,7 +65,7 @@ public class EntityManager {
             String name = story.getEntityName(id);
             String[] dialogue = story.getValidInteraction(id);
 
-            dm.startDialogue(name, dialogue);
+            dm.startDialogue("Thám tử", dialogue);
 
             // Xử lý nhặt đồ (Giữ nguyên logic loại ITEM)
             String type = item.getProperties().get("type", String.class);

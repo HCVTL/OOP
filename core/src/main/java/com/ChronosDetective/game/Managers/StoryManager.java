@@ -22,10 +22,11 @@ public class StoryManager {
 
     // Quản lys FLAGS
     public void setFlag(String flag) {
-        if (flag != null && !flag.isEmpty()) {
-            activeFlags.add(flag);
-            checkLogicTrigger(); // Kiểm tra iều kiện mở khóa sự kiện mới
-        }
+        if (flag == null || flag.isEmpty()) return;
+        if (activeFlags.contains(flag)) return;
+
+        activeFlags.add(flag);
+        checkLogicTrigger();
     }
 
     public boolean hasFlag(String flag) {
@@ -104,5 +105,9 @@ public class StoryManager {
         }
 
         return null;
+    }
+
+    public JsonValue getRoot(){
+        return root;
     }
 }

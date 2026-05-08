@@ -36,8 +36,10 @@ public class MapManager {
         itemLibrary.put("cafe", new Texture("cafe.png"));
         itemLibrary.put("Chìa khóa", new Texture("key.png"));
         itemLibrary.put("none", new Texture("invisible.png"));
+        itemLibrary.put("wine", new Texture("Characters/Wine.png"));
 
         itemLibrary.put("fran", new Texture("Characters/Fran.png"));
+        itemLibrary.put("harlan", new Texture("Characters/Harlan_Thrombey.png"));
     }
 
     public MapManager (EntityManager entityManager) {

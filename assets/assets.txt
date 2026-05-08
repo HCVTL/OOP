@@ -27,6 +27,8 @@ BedRoomKhanhDuy/wardrobes_BR.tsx
 BedroomMaster.tmx
 Characters/Fran.png
 Characters/Fran_animation.png
+Characters/Harlan_Thrombey.png
+Characters/Wine.png
 Garden_map/Houses_Pack/houses.png
 Garden_map/Houses_Pack/houses.psd
 Garden_map/Houses_Pack/public-license.txt

@@ -56,8 +56,8 @@
         {
           "condition": "DEFAULT",
           "text": [
-            "Thám tử: Nạn nhân là ông Harlan, 75 tuổi. Một vết đâm ngay ngực.",
-            "Thám tử: (Vết đâm này trông rất... chủ động. Như thể chính tay ông ấy đã làm.)"
+            "Nạn nhân là ông Harlan, 75 tuổi. Một vết đâm ngay ngực.",
+            "(Vết đâm này trông rất... chủ động. Như thể chính tay ông ấy đã làm.)"
           ],
           "set_flag": "FOUND_BODY"
         }
@@ -71,10 +71,42 @@
         {
           "condition": "DEFAULT",
           "text": [
-            "Thám tử: Chai rượu vang vẫn còn mở nút.",
-            "Thám tử: (Ngửi) Mùi hạnh nhân đắng nồng nặc. Ly rượu vẫn còn ít cặn trắng."
+            "Chai rượu vang vẫn còn mở nút.",
+            "(Ngửi) Mùi hạnh nhân đắng nồng nặc. Ly rượu vẫn còn ít cặn trắng."
           ],
           "set_flag": "FOUND_WINE"
+        }
+      ]
+    },
+    {
+      "id": "Clue_Knife",
+      "name": "Kệ dao",
+      "type": "item",
+      "interactions": [
+        {
+          "condition": "DEFAULT",
+          "text": [
+            "Đây là bộ sưu tập dao của ông ấy. Có một vị trí bị trống.",
+            "Vị trí này vừa khít với con dao đang cắm trên ngực nạn nhân. Nhưng trên kệ không có dấu vân tay hay vết máu nào.",
+            "(Ai đó đã lấy dao từ đây một cách rất cẩn thận, hoặc... con dao đã được lau sạch trước khi cắm vào.)"
+          ],
+          "set_flag": "FOUND_KNIFE"
+        }
+      ]
+    },
+    {
+      "id": "Clue_Window",
+      "name": "Cửa sổ vỡ",
+      "type": "item",
+      "interactions": [
+        {
+          "condition": "DEFAULT",
+          "text": [
+            "Kính vỡ tung tóe trên sàn nhà.",
+            "Lớp rèm lụa mỏng manh này hoàn toàn không có vết xước. Nếu có người trèo qua cửa sổ, rèm phải bị xê dịch.",
+            "Kẻ nào đó đã đập vỡ kính từ bên trong để giả mạo một vụ đột nhập."
+          ],
+          "set_flag": "FOUND_WINDOW"
         }
       ]
     }
@@ -84,5 +116,41 @@
       "required_flags": ["FOUND_BODY", "FOUND_WINE", "FOUND_WINDOW", "FOUND_KNIFE"],
       "set_flag": "READY_TO_DEDUCE"
     }
+  },
+  "deduction_phase": {
+    "trigger_flag": "READY_TO_DEDUCE",
+    "question": "Dấu hiệu trên cơ thể nạn nhân rất lạ. Điều gì đã thực sự giết chết ông ấy?",
+    "options": [
+      {
+        "id": "opt_01",
+        "text": "Vết dao đâm ở ngực",
+        "is_correct": false,
+        "response": [
+          "Thám tử: Rõ ràng là một nhát dao chí mạng vào tim. Hung thủ ra tay rất quyết đoán...",
+          "Fran: Ông thám tử, nếu chỉ nhìn vào con dao thì đứa trẻ lên năm cũng làm được việc của ông. Chủ tôi không bao giờ để kẻ khác đâm mình trực diện mà không chống cự.",
+          "Thám tử: Phải rồi... tay nạn nhân hoàn toàn sạch sẽ. Mình đã bỏ lỡ điều gì đó."
+        ]
+      },
+      {
+        "id": "opt_02",
+        "text": "Sắc mặt tím tái và mùi hạnh nhân",
+        "is_correct": true,
+        "response": [
+          "Thám tử: Phải rồi, vết dao chỉ là giả. Ông ấy đã bị đầu độc bằng Cyanide trước khi bị đâm!",
+          "Thám tử: Hung thủ muốn đánh lạc hướng điều tra bằng một nhát dao giả mạo."
+        ],
+        "set_flag": "DEDUCTION_CORRECT"
+      },
+      {
+        "id": "opt_03",
+        "text": "Bộ đồ ngủ bằng lụa đắt tiền",
+        "is_correct": false,
+        "response": [
+          "Thám tử: Bộ đồ ngủ này... nó quá chỉnh tề. Có lẽ nạn nhân đã chuẩn bị cho cái chết này?",
+          "Ransom: (vọng từ ngoài cửa) Ồ tuyệt vời! Chúng ta thuê một thám tử đại tài để đến đây bình phẩm về gu thời trang của người chết sao?",
+          "Thám tử: Mình đang nghĩ cái quái gì vậy? Tập trung vào dấu hiệu sinh học đi!"
+        ]
+      }
+    ]
   }
 }
