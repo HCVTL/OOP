@@ -24,6 +24,9 @@ html/build/
 *.war
 *.ear
 
+# Gradle Wrapper launcher (Gradle projects should commit this; *.jar ignores it otherwise)
+!gradle/wrapper/gradle-wrapper.jar
+
 # --- Temporary/Log Files ---
 *.log
 *.bin
