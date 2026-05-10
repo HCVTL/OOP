@@ -123,61 +123,133 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
 
     public boolean isFinished() { return charIndex >= fullText.length(); }
 
-    public void draw(SpriteBatch batch) {
-        if (!isActive) return;
+   public void draw(SpriteBatch batch) {
+    if (!isActive) return;
 
-        // --- 1. LOGIC CẬP NHẬT CHỮ CHẠY ---
-        if (charIndex < fullText.length()) {
-            timeCounter += Gdx.graphics.getDeltaTime();
-            if (timeCounter >= CHAR_SPEED) {
-                charIndex++;
-                currentText = fullText.substring(0, charIndex);
-                timeCounter = 0;
-            }
+    // --- 1. LOGIC CẬP NHẬT CHỮ CHẠY ---
+    if (charIndex < fullText.length()) {
+        timeCounter += Gdx.graphics.getDeltaTime();
+        if (timeCounter >= CHAR_SPEED) {
+            charIndex++;
+            currentText = fullText.substring(0, charIndex);
+            timeCounter = 0;
         }
-
-        float zoom = camera.zoom;
-
-        // --- 2. VẼ KHUNG ĐỐI THOẠI (DÙNG SHAPERENDERER) ---
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        // Màu nền đen mờ (Alpha = 0.8)
-        shapeRenderer.setColor(0, 0, 0, 0.8f);
-
-        float boxW = (viewport.getWorldWidth() - 80) * zoom;
-        float boxH = 110 * zoom;
-        float boxX = camera.position.x - boxW / 2;
-        float boxY = camera.position.y - (viewport.getWorldHeight() / 2 * zoom) + (zoom * 40);
-
-        shapeRenderer.rect(boxX, boxY, boxW, boxH);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        // --- 3. VẼ CHỮ (DÙNG SPRITEBATCH) ---
-        batch.begin();
-
-        // Giữ nguyên scale gốc để font sắc nét nhất
-        font.getData().setScale(zoom);
-
-        // Vẽ tên người nói (Màu vàng Cyan hoặc Yellow)
-        font.setColor(Color.CYAN);
-        font.draw(batch, speakerName + ":", boxX + (30 * zoom), boxY + boxH - (20 * zoom));
-
-        // Vẽ nội dung (Màu trắng mờ nhẹ cho đỡ chói)
-        font.setColor(new Color(0.95f, 0.95f, 0.95f, 1f));
-        font.draw(batch, currentText, boxX + (30 * zoom), boxY + boxH - (55 * zoom), boxW - (60 * zoom), -1, true);
-
-        // Vẽ hint khi chạy xong chữ
-        if (isFinished()) {
-            font.getData().setScale(camera.zoom * 0.75f);
-            font.setColor(Color.GRAY);
-            String hint = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
-            font.draw(batch, hint, boxX + boxW - (180 * camera.zoom), boxY + (25 * camera.zoom));
-        }
-        batch.end();
     }
+
+    // --- 2. TÍNH TOÁN KÍCH THƯỚC HỘP ĐỘNG ---
+    float zoom = camera.zoom;
+    font.getData().setScale(zoom);
+
+    float boxW = (viewport.getWorldWidth() - 80) * zoom;
+    float textTargetWidth = boxW - (60 * zoom);
+
+    // Dùng GlyphLayout để tính chiều cao thực tế của nội dung đầy đủ (fullText)
+    // Điều này giúp khung hình không bị nhảy kích thước khi chữ đang chạy
+    com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
+    layout.setText(font, fullText, Color.WHITE, textTargetWidth, com.badlogic.gdx.utils.Align.left, true);
+    
+    float textHeight = layout.height;
+    float paddingTop = 25 * zoom;
+    float paddingBottom = 45 * zoom;
+
+    // Chiều cao khung chính phụ thuộc vào nội dung
+    float boxH = paddingTop + textHeight + paddingBottom;
+    if (boxH < 100 * zoom) boxH = 100 * zoom; 
+
+    float boxX = camera.position.x - boxW / 2;
+    float boxY = camera.position.y - (viewport.getWorldHeight() / 2 * zoom) + (zoom * 40);
+
+    // --- TÍNH TOÁN KHUNG TÊN (NAME BOX) ---
+    float nameBoxW = 0, nameBoxH = 0, nameBoxX = 0, nameBoxY = 0;
+    boolean hasName = speakerName != null && !speakerName.trim().isEmpty();
+
+    if (hasName) {
+        layout.setText(font, speakerName);
+        float nameTextWidth = layout.width;
+        float nameTextHeight = layout.height;
+
+        nameBoxW = nameTextWidth + (40 * zoom);
+        nameBoxH = nameTextHeight + (20 * zoom);
+        nameBoxX = boxX + (20 * zoom);
+        nameBoxY = boxY + boxH - (10 * zoom);
+    }
+
+    // --- 3. VẼ CÁC KHUNG (SHAPERENDERER) ---
+    // Phải kết thúc batch trước khi dùng ShapeRenderer nếu batch đang chạy
+    if (batch.isDrawing()) batch.end();
+
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+    float radius = 12 * zoom;
+    float border = 3 * zoom;
+    Color borderColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+    Color bgColor = new Color(0, 0, 0, 0.8f);
+
+    // 3.1. Vẽ Border và Khung Chính
+    shapeRenderer.setColor(borderColor);
+    drawFilledRoundedRect(boxX - border, boxY - border, boxW + border * 2, boxH + border * 2, radius + border);
+    shapeRenderer.setColor(bgColor);
+    drawFilledRoundedRect(boxX, boxY, boxW, boxH, radius);
+
+    // 3.2. Vẽ Khung Tên
+    if (hasName) {
+        float nameRadius = 8 * zoom;
+        shapeRenderer.setColor(borderColor);
+        drawFilledRoundedRect(nameBoxX - border, nameBoxY - border, nameBoxW + border * 2, nameBoxH + border * 2, nameRadius + border);
+        shapeRenderer.setColor(bgColor);
+        drawFilledRoundedRect(nameBoxX, nameBoxY, nameBoxW, nameBoxH, nameRadius);
+    }
+
+    shapeRenderer.end();
+    Gdx.gl.glDisable(GL20.GL_BLEND);
+
+    // --- 4. VẼ CHỮ (SPRITEBATCH) ---
+    batch.begin();
+    font.getData().setScale(zoom); // Đảm bảo scale đúng sau khi tính toán
+
+    // Vẽ Tên
+    if (hasName) {
+        font.setColor(Color.CYAN);
+        float nameDrawX = nameBoxX + (20 * zoom);
+        float nameDrawY = nameBoxY + nameBoxH - (10 * zoom);
+        font.draw(batch, speakerName, nameDrawX, nameDrawY);
+    }
+
+    // Vẽ Nội Dung (currentText để có hiệu ứng chữ chạy)
+    float currentY = boxY + boxH - paddingTop;
+    font.setColor(new Color(0.95f, 0.95f, 0.95f, 1f));
+    font.draw(batch, currentText, boxX + (30 * zoom), currentY, textTargetWidth, com.badlogic.gdx.utils.Align.left, true);
+
+    // Vẽ Hint khi hoàn thành
+    if (isFinished()) {
+        font.getData().setScale(zoom * 0.75f);
+        font.setColor(Color.GRAY);
+        String hintText = isLastPage() ? "[PRESS E TO CLOSE]" : "[PRESS E FOR NEXT]";
+        // Căn lề phải cho hint
+        font.draw(batch, hintText, boxX + boxW - (200 * zoom), boxY + (25 * zoom));
+    }
+    
+    // Lưu ý: Không đóng batch ở đây nếu bạn muốn các đối tượng khác vẽ tiếp, 
+    // nhưng theo cấu trúc cũ của bạn thì để batch.end() là hợp lý.
+    batch.end();
+}
+
+/**
+ * Hàm hỗ trợ vẽ hình chữ nhật bo góc (vì ShapeRenderer mặc định không có)
+ */
+private void drawFilledRoundedRect(float x, float y, float width, float height, float radius) {
+    // Vẽ 2 hình chữ nhật tạo thành chữ thập
+    shapeRenderer.rect(x + radius, y, width - 2 * radius, height);
+    shapeRenderer.rect(x, y + radius, width, height - 2 * radius);
+
+    // Vẽ 4 góc hình tròn
+    shapeRenderer.arc(x + radius, y + radius, radius, 180f, 90f);
+    shapeRenderer.arc(x + width - radius, y + radius, radius, 270f, 90f);
+    shapeRenderer.arc(x + width - radius, y + height - radius, radius, 0f, 90f);
+    shapeRenderer.arc(x + radius, y + height - radius, radius, 90f, 90f);
+}
 
     public void dispose() {
         shapeRenderer.dispose();

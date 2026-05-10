@@ -11,24 +11,17 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Player extends Entity{
+public class Player extends Entity {
     private TiledMap map;
 
-    private enum State {IDLE, WALKING}
-    private enum Direction {UP, DOWN, LEFT, RIGHT}
+    private enum State { IDLE, WALKING }
+    private enum Direction { UP, DOWN, LEFT, RIGHT }
 
     private State currentState = State.IDLE;
     private Direction currentDirection = Direction.DOWN;
 
-    private Animation<TextureRegion> walkUp;
-    private Animation<TextureRegion> walkDown;
-    private Animation<TextureRegion> walkLeft;
-    private Animation<TextureRegion> walkRight;
-
-    private Animation<TextureRegion> idleUp;
-    private Animation<TextureRegion> idleDown;
-    private Animation<TextureRegion> idleLeft;
-    private Animation<TextureRegion> idleRight;
+    private Animation<TextureRegion> walkUp, walkDown, walkLeft, walkRight;
+    private Animation<TextureRegion> idleUp, idleDown, idleLeft, idleRight;
 
     private float stateTime = 0f;
     private final float SPEED = 100f;
@@ -38,74 +31,65 @@ public class Player extends Entity{
     public Player(Texture texture, float x, float y, TiledMap map) {
         super(texture, x, y);
         this.position = new Vector2(x, y);
-
-
         this.map = map;
+
         int FRAME_COLS = 6;
         int FRAME_ROWS = 6;
 
-        TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS,
-                                                    texture.getHeight() / FRAME_ROWS);
+        TextureRegion[][] tmp = TextureRegion.split(texture, 
+                texture.getWidth() / FRAME_COLS,
+                texture.getHeight() / FRAME_ROWS);
 
         float frameDuration = 0.2f;
+
+        // Thiết lập Animations
+        walkDown = new Animation<>(frameDuration, tmp[3]);
+        walkUp = new Animation<>(frameDuration, tmp[5]);
         walkRight = new Animation<>(frameDuration, tmp[4]);
+        
+        idleDown = new Animation<>(frameDuration, tmp[0]);
+        idleUp = new Animation<>(frameDuration, tmp[2]);
         idleRight = new Animation<>(frameDuration, tmp[1]);
 
+        // Xử lý quay trái (Flip từ frame bên phải)
         TextureRegion[] walkLeftFrames = new TextureRegion[FRAME_COLS];
         TextureRegion[] idleLeftFrames = new TextureRegion[FRAME_COLS];
         for (int i = 0; i < FRAME_COLS; i++) {
             walkLeftFrames[i] = new TextureRegion(tmp[4][i]);
             walkLeftFrames[i].flip(true, false);
-
             idleLeftFrames[i] = new TextureRegion(tmp[1][i]);
             idleLeftFrames[i].flip(true, false);
         }
         walkLeft = new Animation<>(frameDuration, walkLeftFrames);
         idleLeft = new Animation<>(frameDuration, idleLeftFrames);
 
-        walkDown = new Animation<>(frameDuration, tmp[3]);
-        walkUp = new Animation<>(frameDuration, tmp[5]);
-        idleDown = new Animation<>(frameDuration, tmp[0]);
-        idleUp = new Animation<>(frameDuration, tmp[2]);
-
-        walkDown.setPlayMode(Animation.PlayMode.LOOP);
-        walkUp.setPlayMode(Animation.PlayMode.LOOP);
-        walkLeft.setPlayMode(Animation.PlayMode.LOOP);
-        walkRight.setPlayMode(Animation.PlayMode.LOOP);
-
-        idleDown.setPlayMode(Animation.PlayMode.LOOP);
-        idleUp.setPlayMode(Animation.PlayMode.LOOP);
-        idleLeft.setPlayMode(Animation.PlayMode.LOOP);
-        idleRight.setPlayMode(Animation.PlayMode.LOOP);
-
+        // Thiết lập chế độ Loop cho tất cả
+        Animation[] allAnims = {walkUp, walkDown, walkLeft, walkRight, idleUp, idleDown, idleLeft, idleRight};
+        for (Animation a : allAnims) a.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     @Override
     public void update(float delta) {
         currentState = State.IDLE;
-
         float oldX = position.x;
         float oldY = position.y;
+        float moveX = 0, moveY = 0;
 
-        float moveX = 0;
-        float moveY = 0;
-
+        // Xử lý Input
         if (Gdx.input.isKeyPressed(Input.Keys.W)) { moveY += SPEED * delta; currentDirection = Direction.UP; currentState = State.WALKING; }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) { moveY -= SPEED * delta; currentDirection = Direction.DOWN; currentState = State.WALKING; }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) { moveX -= SPEED * delta; currentDirection = Direction.LEFT; currentState = State.WALKING; }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) { moveX += SPEED * delta; currentDirection = Direction.RIGHT; currentState = State.WALKING; }
 
+        // Di chuyển và check va chạm X
         position.x += moveX;
-        if (checkCollisionAtPoints(position.x, position.y)) {
-            position.x = oldX;
-        }
+        if (checkCollisionAtPoints(position.x, position.y)) position.x = oldX;
 
+        // Di chuyển và check va chạm Y
         position.y += moveY;
-        if (checkCollisionAtPoints(position.x, position.y)) {
-            position.y = oldY;
-        }
+        if (checkCollisionAtPoints(position.x, position.y)) position.y = oldY;
 
-
+        // Cập nhật tọa độ Entity cha để đồng bộ logic tương tác
         this.x = position.x;
         this.y = position.y;
         stateTime += delta;
@@ -113,31 +97,31 @@ public class Player extends Entity{
 
     public void draw(SpriteBatch batch) {
         TextureRegion currentFrame;
-
+        
+        // Chọn Animation dựa trên trạng thái
         if (currentState == State.WALKING) {
             switch (currentDirection) {
-                case UP: currentFrame = walkUp.getKeyFrame(stateTime); break;
-                case DOWN: currentFrame = walkDown.getKeyFrame(stateTime); break;
-                case LEFT: currentFrame = walkLeft.getKeyFrame(stateTime); break;
+                case UP:    currentFrame = walkUp.getKeyFrame(stateTime); break;
+                case LEFT:  currentFrame = walkLeft.getKeyFrame(stateTime); break;
                 case RIGHT: currentFrame = walkRight.getKeyFrame(stateTime); break;
-                default: currentFrame = walkDown.getKeyFrame(stateTime); break;
+                default:    currentFrame = walkDown.getKeyFrame(stateTime); break;
             }
-        }
-        else {
+        } else {
             switch (currentDirection) {
                 case UP:    currentFrame = idleUp.getKeyFrame(stateTime); break;
-                case DOWN:  currentFrame = idleDown.getKeyFrame(stateTime); break;
                 case LEFT:  currentFrame = idleLeft.getKeyFrame(stateTime); break;
                 case RIGHT: currentFrame = idleRight.getKeyFrame(stateTime); break;
                 default:    currentFrame = idleDown.getKeyFrame(stateTime); break;
             }
         }
 
-        batch.draw(currentFrame, position.x, position.y, width, height);
+        // Áp dụng offset 4f khi đi bộ để frame mượt hơn
+        float drawY = (currentState == State.WALKING) ? position.y - 4f : position.y;
+        batch.draw(currentFrame, position.x, drawY, width, height);
     }
 
     public boolean isCollision(float worldX, float worldY) {
-        // 1. Danh sách tất cả các lớp vật cản
+        // Danh sách layer cần chặn (Lưu ý: Phải khớp với tên Layer trong Tiled của bạn Hưng)
         String[] solidLayers = {"Wall", "Fences", "Decor"};
 
         int tileX = (int)(worldX / 16);
@@ -145,76 +129,44 @@ public class Player extends Entity{
 
         for (String name : solidLayers) {
             TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(name);
-
-            // Nếu map không có lớp này thì bỏ qua, tìm lớp tiếp theo
             if (layer == null) continue;
 
-            // 2. Check giới hạn bản đồ dựa trên lớp đang xét
-            if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) {
-                return true; // Chặn nếu đi ra ngoài biên
-            }
-
-            // 3. Nếu tại ô gạch này có Tile (Cell != null) -> Có vật cản
-            if (layer.getCell(tileX, tileY) != null) {
-                return true; // Chỉ cần chạm 1 lớp là đủ để chặn lại
-            }
+            if (tileX < 0 || tileY < 0 || tileX >= layer.getWidth() || tileY >= layer.getHeight()) return true;
+            if (layer.getCell(tileX, tileY) != null) return true;
         }
-
-        return false; // Đi xuyên qua thoải mái nếu không chạm lớp nào
+        return false;
     }
 
     private boolean checkCollisionAtPoints(float x, float y) {
-        float pX = 20f;
-        float pY = 10f;
-
-        return (isCollision(x + pX, y + pY) || isCollision(x + width - pX, y + pY) ||
-                isCollision(x + pX, y + height / 2) || isCollision(x + width - pX, y + height / 2));
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public float getHeight() {
-        return height;
+        float pX = 20f; // Biên ngang (càng lớn khung va chạm càng hẹp)
+        float pY = 10f; // Biên dọc (càng lớn khung va chạm càng thấp)
+        return (isCollision(x + pX, y + pY) || 
+                isCollision(x + width - pX, y + pY) ||
+                isCollision(x + pX, y + height / 2) || 
+                isCollision(x + width - pX, y + height / 2));
     }
 
     public Rectangle getBounds() {
-        // 64 (chiều rộng nhân vật) - 20 (chiều rộng khung) = 44
-        // Chia đôi ra là 22 để khung nằm chính giữa theo chiều ngang
         float offsetX = (width - 20) / 2f;
-
-        // Y giữ nguyên hoặc cộng thêm một chút nếu muốn khung nằm ở chân
-        float offsetY = 5f;
-
-        return new Rectangle(position.x + offsetX, position.y + offsetY, 20, 20);
+        return new Rectangle(position.x + offsetX, position.y + 5f, 20, 20);
     }
 
-    // Sửa Item thành Entity để dùng chung cho cả NPC và Vật chứng
     public boolean isNear(Entity entity) {
         if (entity == null) return false;
-
-        float centerX = this.x + getWidth() / 2;
-        float centerY = this.y + getHeight() / 2;
-
+        float centerX = this.x + width / 2;
+        float centerY = this.y + height / 2;
         float targetX = entity.getX() + entity.getWidth() / 2;
         float targetY = entity.getY() + entity.getHeight() / 2;
-
-        float distance = Vector2.dst(centerX, centerY, targetX, targetY);
-
-        return distance < 50f;
+        return Vector2.dst(centerX, centerY, targetX, targetY) < 50f;
     }
 
-    public void setMap(TiledMap newMap) {
-        this.map = newMap;
-    }
-
-    public void setPosition(float x, float y) {
-        position.x = x;
-        position.y = y;
-    }
+    public void setMap(TiledMap newMap) { this.map = newMap; }
+    public void setPosition(float x, float y) { this.position.set(x, y); }
+    public float getWidth() { return width; }
+    public float getHeight() { return height; }
 
     public void dispose() {
-        sprite.getTexture().dispose();
+        // Chỉ dispose nếu texture này không dùng chung với các entity khác
+        // Thường thì texture player load riêng nên ok
     }
 }

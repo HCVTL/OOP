@@ -340,6 +340,7 @@ pixelinterior_LRK_v1.1/kitchen_LRK.png
 pixelinterior_LRK_v1.1/license.txt
 pixelinterior_LRK_v1.1/livingroom_LRK.png
 readingBook.tmx
+saves/index.json
 sprites/characters/README.txt
 sprites/characters/player.png
 sprites/characters/skeleton.png
