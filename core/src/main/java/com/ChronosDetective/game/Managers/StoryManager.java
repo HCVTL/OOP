@@ -110,4 +110,12 @@ public class StoryManager {
     public JsonValue getRoot(){
         return root;
     }
+
+    public JsonValue getDeductionData() {
+        if (root.has("deduction_phase")) {
+            return root.get("deduction_phase");
+        }
+
+        return null;
+    }
 }

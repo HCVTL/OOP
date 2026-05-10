@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class DialogueManager implements com.badlogic.gdx.InputProcessor{
@@ -30,6 +31,9 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
     private int charIndex = 0;
     private float timeCounter = 0;
     private final float CHAR_SPEED = 0.035f; // Tốc độ chạy chữ (giây/ký tự)
+
+    //Biến lưu trữ cho Deduction
+    private Runnable endCallback;
 
     public DialogueManager(Viewport viewport, OrthographicCamera camera) {
         this.viewport = viewport;
@@ -80,6 +84,11 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
         }
     }
 
+    //Hàm để thám tử cài đặt hành động sau khi thoại kết thúc
+    public void setDialogueEndCallback(Runnable callback) {
+        this.endCallback = callback;
+    }
+
     // Lật trang tiếp theo
     public void nextPage() {
         if (charIndex < fullText.length()) {
@@ -103,6 +112,11 @@ public class DialogueManager implements com.badlogic.gdx.InputProcessor{
 
     public void closeDialogue() {
         this.isActive = false;
+
+        if (endCallback != null) {
+            endCallback.run();
+            endCallback = null;
+        }
     }
 
     public boolean isActive() { return isActive; }

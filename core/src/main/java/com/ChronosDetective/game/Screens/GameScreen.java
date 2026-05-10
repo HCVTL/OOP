@@ -1,6 +1,7 @@
 package com.ChronosDetective.game.Screens;
 
 import com.ChronosDetective.game.Managers.*;
+import com.ChronosDetective.game.UI.DeductionUI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -84,6 +85,8 @@ public class GameScreen implements Screen {
 
     private ShapeRenderer debugRenderer;
 
+    private DeductionUI deductionUI;
+
     // BIẾN CHO FONT VÀ TIẾNG VIỆT
     private BitmapFont gameUiFont;
     private static final String VIETNAMESE_CHARS = "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỊĐ";
@@ -130,6 +133,10 @@ public class GameScreen implements Screen {
 
         // Khởi tạo Font và Giao diện trước khi tạo Dialog
         setupGameUiFont();
+
+        // Khoi tao DeductionUI
+        deductionUI = new DeductionUI(uiStage, VisUI.getSkin());
+        deductionUI.setupDeduction(storyManager.getDeductionData(), storyManager, dialogueManager);
 
 
         inventoryUI = new InventoryUI();
@@ -280,6 +287,18 @@ public class GameScreen implements Screen {
             player.draw(batch);
             entityManager.draw(batch, player);
         batch.end();
+
+
+        if (storyManager.hasFlag("READY_TO_DEDUCE") && !storyManager.hasFlag("DEDUCTION_CORRECT")) {
+            if (!deductionUI.isVisible() && !dialogueManager.isActive()) {
+                deductionUI.show();
+            }
+        }
+
+        if (storyManager.hasFlag("DEDUCTION_CORRECT")) {
+            storyManager.setFlag("CHAPTER_1_COMPLETE");
+        }
+
 
 
         // Trong GameScreen.render() sau khi vẽ batch.end()
