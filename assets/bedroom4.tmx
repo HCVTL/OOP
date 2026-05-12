@@ -11,6 +11,7 @@
  <tileset firstgid="2902" source="map_Kitchen/floorswalls.tsx"/>
  <tileset firstgid="3126" source="map_Livingroom/pixelinterior_BR_v1.1/wardrobes_BR.tsx"/>
  <tileset firstgid="3609" source="map_hall/decor.tsx"/>
+ <tileset firstgid="3729" source="../../../New folder/OOP/assets/map_Kitchen/floorswalls.tsx"/>
  <layer id="1" name="Floor" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -43,8 +44,8 @@
 3221225528,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,
 3221225514,0,0,0,0,0,0,0,0,0,0,0,0,0,0,84,
 3221225570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,
-3221225556,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-3221225542,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+3221225556,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3826,
+3221225542,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3826,
 3221225528,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,
 3221225514,0,0,0,0,0,0,0,0,0,0,0,0,0,0,84,
 3221225500,0,0,0,0,0,0,0,0,0,0,0,0,0,0,98,
@@ -104,13 +105,6 @@
     <property name="spawnX" type="float" value="10"/>
     <property name="spawnY" type="float" value="10"/>
     <property name="targetMap" value="map.tmx"/>
-   </properties>
-  </object>
-  <object id="4" x="242.333" y="160.333" width="27.3333" height="31.3333">
-   <properties>
-    <property name="spawnX" type="float" value="210"/>
-    <property name="spawnY" type="float" value="185"/>
-    <property name="targetMap" value="bathroom.tmx"/>
    </properties>
   </object>
  </objectgroup>
