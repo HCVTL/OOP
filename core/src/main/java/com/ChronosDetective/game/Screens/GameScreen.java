@@ -20,7 +20,6 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -91,6 +90,14 @@ public class GameScreen implements Screen {
     private BitmapFont gameUiFont;
     private static final String VIETNAMESE_CHARS = "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỊĐ";
 
+    // 🚨 THÊM BIẾN CUTSCENE: Cần thiết để chiếu phim
+    private com.badlogic.gdx.scenes.scene2d.ui.Image blackOverlay;
+    private com.badlogic.gdx.audio.Music rainSound;
+    private com.badlogic.gdx.audio.Sound clockSound;
+    private com.badlogic.gdx.audio.Sound sighSound;
+    private boolean isIntroPlaying = true;
+    private boolean shouldPlayIntro;
+
     public GameScreen(ChronosDetectiveGame game) {
         this(game, new SaveRepository().createNewSessionId(), false);
     }
@@ -138,13 +145,11 @@ public class GameScreen implements Screen {
         deductionUI = new DeductionUI(uiStage, VisUI.getSkin());
         deductionUI.setupDeduction(storyManager.getDeductionData(), storyManager, dialogueManager);
 
-
         inventoryUI = new InventoryUI();
-        // 2. KHỞI TẠO PLAYER (PHẢI NẰM Ở ĐÂY, TRƯỚC KHI LOAD MAP)
-        Texture playerTexture = new Texture("player_animation.png");
-        // Đảm bảo bạn CÓ dòng này và nó không bị comment //
-        player = new Player(playerTexture, 100, 100, null);
 
+        // 2. KHỞI TẠO PLAYER
+        Texture playerTexture = new Texture("player_animation.png");
+        player = new Player(playerTexture, 100, 100, null);
 
         // --- CHUẨN BỊ THÔNG SỐ (Nếu là New Game) ---
         String mapPathToLoad = "hall.tmx";
@@ -154,31 +159,32 @@ public class GameScreen implements Screen {
         // --- LOAD MAP ---
         mapManager.loadMap(mapPathToLoad, mapPathToLoad, player, startX, startY);
 
-        // Intro Chuong 1
-        dialogueManager.startDialogue("Thám tử", storyManager.getIntro());
+        // 🚨 THAY THẾ: Gọi kịch bản Cutscene thay vì dòng thoại cứng
+        this.shouldPlayIntro = !loadOnStart;
+        if (shouldPlayIntro) {
+            playIntroCutscene();
+            shouldPlayIntro = false;
+        } else {
+            isIntroPlaying = false;
+        }
 
         // --- ĐỌC SAVE VÀ PHỤC HỒI DỮ LIỆU ---
         if (loadOnStart) {
             SaveData data = saves.loadGame(sessionId);
             if (data != null) {
-                // 1. Lấy lại tọa độ và Map
                 startX = data.playerX;
                 startY = data.playerY;
                 if (data.currentMapName != null) {
                     mapPathToLoad = data.currentMapName;
                 }
-
-                // 2. Trả lại Sổ đen cho MapManager
                 if (data.collectedItemIds != null) {
                     mapManager.setCollectedItems(data.collectedItemIds);
                 }
-
-                // 3. Phục hồi Túi Đồ
                 if (data.inventoryItemIds != null) {
                     for (String itemId : data.inventoryItemIds) {
                         Item restoredItem = mapManager.createItemFromId(itemId);
                         if (restoredItem != null) {
-                            restoredItem.collect(); // Phải gọi để nó ko vẽ ra màn hình
+                            restoredItem.collect();
                             inventoryManager.addItem(restoredItem);
                         }
                     }
@@ -211,7 +217,6 @@ public class GameScreen implements Screen {
             com.badlogic.gdx.scenes.scene2d.ui.Skin skin = VisUI.getSkin();
             skin.add("default-font", gameUiFont, BitmapFont.class);
 
-            // Nền đen tuyền không bo góc để tránh loang lổ
             Drawable blackBg = createSolidBackground(new Color(0, 0, 0, 1f));
             Drawable buttonUp = createSolidBackground(new Color(0.15f, 0.15f, 0.15f, 1f));
             Drawable buttonOver = createSolidBackground(new Color(0.25f, 0.25f, 0.25f, 1f));
@@ -239,33 +244,34 @@ public class GameScreen implements Screen {
             || inventoryUI.isVisible()
             || dialogueManager.isActive();
 
-        // O -> open save dialog (chi mo khi chua co overlay nao)
         if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.O)) showSaveDialog();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) inventoryUI.toggle();
         if (inventoryUI.isVisible()) {
             inventoryUI.handleInput();
         }
-        // ESC -> show confirm dialog (chi mo khi chua co overlay nao)
         if (!isAnyOverlayOpen && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) showExitConfirm();
 
+        // 🚨 ĐÃ SỬA LỖI UI: Bắt buộc khai báo deductionUI đang mở để khóa thám tử lại!
         isAnyOverlayOpen = (exitConfirmDialog != null && exitConfirmDialog.isVisible())
             || (saveDialog != null && saveDialog.isVisible())
             || inventoryUI.isVisible()
-            || dialogueManager.isActive();
+            || dialogueManager.isActive()
+            || (deductionUI != null && deductionUI.isVisible());
 
-        // 2. Cập nhật logic (Quan trọng!)
-        if (!isAnyOverlayOpen) {
+        // 🚨 ĐÃ SỬA LỖI LOGIC: Đưa TOÀN BỘ tương tác vào chung 1 ổ khóa
+        if (!isAnyOverlayOpen && !isIntroPlaying) {
             player.update(delta);
-            // CHECK PORTAL Ở ĐÂY
             mapManager.checkPortals(player, (targetMap, x, y) -> {
                 mapManager.loadMap(targetMap,targetMap, player, x, y);
             });
+
+            // Hàm này ngày xưa nằm ngoài nên gây lỗi, giờ phải nhét vào đây!
+            entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager, storyManager);
         }
-        entityManager.update(delta, player, dialogueManager, inventoryManager, mapManager, storyManager);
 
         // 3. Cập nhật Camera đuổi theo nhân vật
-        float lerp = 0.1f; // Tốc độ đuổi theo (0.1 là khá mượt)
+        float lerp = 0.1f;
         camera.position.x += (player.getX() - camera.position.x) * lerp;
         camera.position.y += (player.getY() - camera.position.y) * lerp;
         camera.update();
@@ -281,13 +287,11 @@ public class GameScreen implements Screen {
         }
 
         batch.setProjectionMatrix(camera.combined);
-        // Reset mau batch moi frame de tranh bi UI/dialog de lai alpha khac 1
         batch.setColor(Color.WHITE);
         batch.begin();
-            player.draw(batch);
-            entityManager.draw(batch, player);
+        player.draw(batch);
+        entityManager.draw(batch, player);
         batch.end();
-
 
         if (storyManager.hasFlag("READY_TO_DEDUCE") && !storyManager.hasFlag("DEDUCTION_CORRECT")) {
             if (!deductionUI.isVisible() && !dialogueManager.isActive()) {
@@ -299,35 +303,38 @@ public class GameScreen implements Screen {
             storyManager.setFlag("CHAPTER_1_COMPLETE");
         }
 
-
-
-        // Trong GameScreen.render() sau khi vẽ batch.end()
         debugRenderer.setProjectionMatrix(camera.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.RED);
 
-        // Vẽ thử cái khung của Portal
         MapLayer layer = mapManager.getCurrentMap().getLayers().get("Door");
-        for (MapObject obj : layer.getObjects()) {
-            if (obj instanceof RectangleMapObject) {
-                Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                debugRenderer.rect(r.x, r.y, r.width, r.height);
+        if (layer != null) {
+            for (MapObject obj : layer.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                    debugRenderer.rect(r.x, r.y, r.width, r.height);
+                }
             }
         }
 
-        debugRenderer.setColor(Color.BLUE); // Màu xanh cho thám tử
+        debugRenderer.setColor(Color.BLUE);
         Rectangle pb = player.getBounds();
         debugRenderer.rect(pb.x, pb.y, pb.width, pb.height);
         debugRenderer.end();
 
-
-        // 3. Vẽ UI (Hộp thoại trên cùng)
-        dialogueManager.draw(batch);
+        // 3. Vẽ UI
         inventoryUI.draw(batch, debugRenderer, uiViewport, inventoryManager, gameUiFont);
         stage.draw();
-        // 4. Vẽ overlay UI (ESC confirm)
+
+        // 4. Vẽ overlay UI (ESC confirm, DeductionUI, Màn đen Cutscene)
         uiStage.act(delta);
         uiStage.draw();
+
+        // 🚨 SỬA LỖI ĐỒ HỌA: Thoại phải nằm dưới cùng này để vẽ đè lên bức màn đen!
+        if (dialogueManager != null && dialogueManager.isActive()) {
+            batch.setProjectionMatrix(camera.combined);
+            dialogueManager.draw(batch);
+        }
     }
 
     @Override
@@ -338,15 +345,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {}
-
     @Override
     public void resume() {}
-
     @Override
-    public void hide() {
-        // Hàm này gọi khi bạn chuyển sang Screen khác
-        // Thường dùng để gọi dispose() hoặc dừng nhạc
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {
@@ -371,10 +373,8 @@ public class GameScreen implements Screen {
             }
         };
 
-        // 1. Chỉnh bảng nội dung
         Table content = exitConfirmDialog.getContentTable();
         content.clear();
-        // Tăng Pad Bottom để chừa chỗ cho các nút bấm chui vào trong
         content.pad(40, 50, 80, 50);
 
         VisLabel msg = new VisLabel("Bạn có muốn tạm dừng điều tra\nvà quay về Menu chính không?");
@@ -382,19 +382,14 @@ public class GameScreen implements Screen {
         msg.setWrap(true);
         content.add(msg).width(450).center().row();
 
-        // 2. Thêm nút bấm theo cách chuẩn của Dialog
         VisTextButton yesBtn = new VisTextButton("THOÁT GAME");
         VisTextButton noBtn = new VisTextButton("TIẾP TỤC");
 
         exitConfirmDialog.button(yesBtn, true);
         exitConfirmDialog.button(noBtn, false);
 
-        // 3. ĐƯA CÁC NÚT VÀO TRONG KHUNG
-        // Lấy bảng nút mặc định của Dialog
         Table bTable = exitConfirmDialog.getButtonsTable();
-        // Đẩy bảng nút lên trên một chút để nó nằm trong background đen
         bTable.padBottom(30);
-
         bTable.getCell(yesBtn).width(180).height(50).padRight(20);
         bTable.getCell(noBtn).width(180).height(50);
 
@@ -406,7 +401,6 @@ public class GameScreen implements Screen {
             || (exitConfirmDialog != null && exitConfirmDialog.isVisible())) return;
 
         final ArrayList<SaveSessionMeta> sessions = saves.listSessionsNewestFirst();
-
         boolean hasCurrent = false;
         for (SaveSessionMeta m : sessions) {
             if (m != null && sessionId.equals(m.id)) { hasCurrent = true; break; }
@@ -475,5 +469,57 @@ public class GameScreen implements Screen {
             : "Mới";
         String prefix = sessionId.equals(meta.id) ? "[HIỆN TẠI] " : "";
         return prefix + meta.id + " | " + time;
+    }
+
+    // 🚨 THÊM: Đạo diễn phim
+    private void playIntroCutscene() {
+        rainSound = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("rain.mp3"));
+        clockSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("clock.mp3"));
+        sighSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sigh.mp3"));
+
+        com.badlogic.gdx.graphics.Texture blackTex = new com.badlogic.gdx.graphics.Texture("black_pixel.png");
+        blackOverlay = new com.badlogic.gdx.scenes.scene2d.ui.Image(blackTex);
+        blackOverlay.setSize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        blackOverlay.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
+        uiStage.addActor(blackOverlay);
+
+        String[] introLines = storyManager.getIntro();
+        String thoai1 = introLines.length > 0 ? introLines[0] : "...";
+        String[] thoaiSau = new String[] {
+            introLines.length > 1 ? introLines[1] : "...",
+            introLines.length > 2 ? introLines[2] : "..."
+        };
+
+        rainSound.setLooping(true);
+        rainSound.setVolume(0.5f);
+        rainSound.play();
+
+        uiStage.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> clockSound.play()),
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(5f),
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> sighSound.play()),
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(1f),
+
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> dialogueManager.startDialogue("Thám tử", new String[]{thoai1})),
+            new com.badlogic.gdx.scenes.scene2d.Action() {
+                @Override
+                public boolean act(float delta) { return !dialogueManager.isActive(); }
+            },
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(1f),
+
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> blackOverlay.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut(3f))),
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(3f),
+
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> dialogueManager.startDialogue("Thám tử", thoaiSau)),
+            new com.badlogic.gdx.scenes.scene2d.Action() {
+                @Override
+                public boolean act(float delta) { return !dialogueManager.isActive(); }
+            },
+
+            com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> {
+                isIntroPlaying = false;
+                rainSound.setVolume(0.2f);
+            })
+        ));
     }
 }

@@ -101,7 +101,9 @@ bedroom2KD.tmx
 bedroom3.tmx
 bedroom4.tmx
 bedroomKD.tmx
+black_pixel.png
 cafe.png
+clock.mp3
 decorations_LRK.tsx
 door.tsx
 door_LRK.tsx
@@ -339,8 +341,9 @@ pixelinterior_LRK_v1.1/floorswalls_LRK.png
 pixelinterior_LRK_v1.1/kitchen_LRK.png
 pixelinterior_LRK_v1.1/license.txt
 pixelinterior_LRK_v1.1/livingroom_LRK.png
+rain.mp3
 readingBook.tmx
-saves/index.json
+sigh.mp3
 sprites/characters/README.txt
 sprites/characters/player.png
 sprites/characters/skeleton.png

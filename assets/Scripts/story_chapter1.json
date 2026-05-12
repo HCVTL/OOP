@@ -3,9 +3,9 @@
   "global_events": {
     "intro": {
       "text": [
-        "Thám tử: Harlan Thrombey... Một triệu phú, một bậc thầy của những câu chuyện trinh thám.",
-        "Thám tử: Trớ trêu thay, chương cuối cùng trong cuộc đời ông ta lại kết thúc bằng một vụ án thực sự.",
-        "Thám tử: Bữa tiệc tối qua không phải để mừng thọ. Nó là một chiến trường của những kẻ tham lam."
+        "Harlan Thrombey... Một triệu phú, một bậc thầy của những câu chuyện trinh thám.",
+        "Trớ trêu thay, chương cuối cùng trong cuộc đời ông ta lại kết thúc bằng một vụ án thực sự.",
+        "Bữa tiệc tối qua không phải để mừng thọ. Nó là một chiến trường của những kẻ tham lam."
       ],
       "set_flag": "INTRO_FINISHED"
     },
